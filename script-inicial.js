@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const materiasPorAno = {
         "ano1": [
             { codigo: "MED100", nombre: "MED 100 - ANATOMÍA HUMANA" },
-            { codigo: "MED101", nombre: "HISTOLOGÍA Y EMBRIOLOGÍA" },
+            { codigo: "MED101", nombre: "MED 101 - HISTOLOGÍA Y EMBRIOLOGÍA" },
 	    { codigo: "SAP100", nombre: "SAP 100 - SALUD PÚBLICA I" },
 	    { codigo: "MAF100", nombre: "MAF 100 - FORMACIÓN SOCIOCULTURAL" },
 			
