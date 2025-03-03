@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selección de Materias</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<h1>Seleccione las materias (Se pueden seleccionar materias de cualquier año)</h1>
+<div id="contenedor-anos">
+    <div class="columna-ano" id="ano1">
+            <h2 onclick="mostrarMaterias('ano1')">1º AÑO</h2>
+            <div class="materias-ano" id="materias-ano1"></div>
+        </div>
+        <div class="columna-ano" id="ano2">
+            <h2 onclick="mostrarMaterias('ano2')">2º AÑO</h2>
+            <div class="materias-ano" id="materias-ano2"></div>
+        </div>
+        <div class="columna-ano" id="ano3">
+            <h2 onclick="mostrarMaterias('ano3')">3º AÑO</h2>
+            <div class="materias-ano" id="materias-ano3"></div>
+        </div>
+        <div class="columna-ano" id="ano4">
+            <h2 onclick="mostrarMaterias('ano4')">4º AÑO</h2>
+            <div class="materias-ano" id="materias-ano4"></div>
+        </div>
+        <div class="columna-ano" id="ano5">
+            <h2 onclick="mostrarMaterias('ano5')">5º AÑO</h2>
+            <div class="materias-ano" id="materias-ano5"></div>
+        </div>
+    </div>
+	<br>
+<button id="continuar" onclick="redirigirAHorario()">Continuar</button>
+<script src="script-inicial.js"></script>
+
+<h4>Elaborado por ELEON&nbsp;</h4>
+</body>
+</html>
