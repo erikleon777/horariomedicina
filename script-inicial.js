@@ -4,8 +4,8 @@ document.addEventListener("DOMContentLoaded", function () {
         "ano1": [
             { codigo: "MED100", nombre: "MED 100 - ANATOMÍA HUMANA" },
             { codigo: "MED101", nombre: "HISTOLOGÍA Y EMBRIOLOGÍA" },
-			{ codigo: "SAP100", nombre: "SAP 100 - SALUD PÚBLICA I" },
-			{ codigo: "MAF100", nombre: "MAF 100 - FORMACIÓN SOCIOCULTURAL" },
+	    { codigo: "SAP100", nombre: "SAP 100 - SALUD PÚBLICA I" },
+	    { codigo: "MAF100", nombre: "MAF 100 - FORMACIÓN SOCIOCULTURAL" },
 			
             // Agrega más materias de 1º año
         ],
