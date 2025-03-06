@@ -1,12 +1,15 @@
 	body {
-		font-family: Aptos Narrow, sans-serif;
+		font-family: Segoe UI, sans-serif;
 		font-size: 12px;
+    		background-color: #FFF5EC; /* Cambia #f0f0f0 por el color que desees */
+
 	}
 
 	#contenedor-anos, #contenedor-materias {
 		display: flex;
 		justify-content: space-around;
 		margin-top: 10px;
+		background-color: #FFFFFF
 	}
 
 	.columna-ano, .columna-materia {
@@ -20,7 +23,7 @@
 	.columna-ano h2, .columna-materia h2 {
 		margin: 1px;
 		padding: 5px;
-		background-color: #f2f2f2;
+		background-color: #C2C2C2;
 		border-radius: 5px;
 		cursor: pointer;
 	}
@@ -45,6 +48,7 @@
 		width: 100%;
 		border-collapse: collapse;
 		margin-top: 20px;
+		background-color: #FFFFFF
 	}
 
 	th, td {
@@ -55,7 +59,8 @@
 
 	th {
 		background-color: #f2f2f2;
-	}button {
+	}
+	button {
     padding: 10px 20px;
     font-size: 14px;
     border: none;
