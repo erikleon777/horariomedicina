@@ -1436,52 +1436,86 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Función para mostrar grupos y subgrupos de una materia
-    function mostrarGruposYSubgrupos(contenedor, codigo, materia) {
-        for (let i = 0; i < materia.grupos; i++) {
-            const grupo = String.fromCharCode(65 + i); // A, B, C, ...
-
-            // Checkbox para el grupo
-            const labelGrupo = document.createElement("label");
-            const checkboxGrupo = document.createElement("input");
-            checkboxGrupo.type = "checkbox";
-            checkboxGrupo.value = grupo;
-            checkboxGrupo.id = `grupo-${codigo}-${grupo}`;
-            checkboxGrupo.addEventListener("change", function () {
-                mostrarSubgrupos(contenedor, codigo, grupo, materia.subgrupos);
-            });
-            labelGrupo.appendChild(checkboxGrupo);
-            labelGrupo.appendChild(document.createTextNode(`Grupo ${grupo}`));
-            contenedor.appendChild(labelGrupo);
-
-            // Contenedor para subgrupos
-            const contenedorSubgrupos = document.createElement("div");
-            contenedorSubgrupos.id = `subgrupos-${codigo}-${grupo}`;
-            contenedorSubgrupos.style.display = "none"; // Ocultar inicialmente
-            contenedor.appendChild(contenedorSubgrupos);
+function mostrarGruposYSubgrupos(contenedor, codigo, materia) {
+    for (let i = 0; i < materia.grupos; i++) {
+        const grupo = String.fromCharCode(65 + i); // A, B, C, ...
+        
+        // Crear contenedor del grupo
+        const grupoContainer = document.createElement("div");
+        grupoContainer.className = "grupo-container";
+        
+        // Checkbox para el grupo
+        const labelGrupo = document.createElement("label");
+        labelGrupo.className = "grupo-label";
+        
+        const checkboxGrupo = document.createElement("input");
+        checkboxGrupo.type = "checkbox";
+        checkboxGrupo.value = grupo;
+        checkboxGrupo.id = `grupo-${codigo}-${grupo}`;
+        checkboxGrupo.addEventListener("change", function() {
+            mostrarSubgrupos(grupoContainer, codigo, grupo, materia.subgrupos);
+        });
+        
+        // Añadir nombre del docente si existe
+        const docente = textosPersonalizados[codigo]?.[grupo + "1"]; // Tomamos el docente del primer subgrupo
+        const docenteSpan = document.createElement("span");
+        docenteSpan.className = "docente-nombre";
+        if (docente) {
+            docenteSpan.textContent = ` - ${docente}`;
         }
+        
+        labelGrupo.appendChild(checkboxGrupo);
+        labelGrupo.appendChild(document.createTextNode(`Grupo ${grupo}`));
+        labelGrupo.appendChild(docenteSpan);
+        
+        grupoContainer.appendChild(labelGrupo);
+        
+        // Contenedor para subgrupos
+        const contenedorSubgrupos = document.createElement("div");
+        contenedorSubgrupos.id = `subgrupos-${codigo}-${grupo}`;
+        contenedorSubgrupos.className = "subgrupos-container";
+        contenedorSubgrupos.style.display = "none";
+        grupoContainer.appendChild(contenedorSubgrupos);
+        
+        contenedor.appendChild(grupoContainer);
     }
+}
 
     // Función para mostrar subgrupos de un grupo seleccionado
-    function mostrarSubgrupos(contenedor, codigo, grupo, subgrupos) {
-        const contenedorSubgrupos = document.getElementById(`subgrupos-${codigo}-${grupo}`);
-        contenedorSubgrupos.innerHTML = ""; // Limpiar contenido anterior
-
-        for (let j = 1; j <= subgrupos; j++) {
-            const subgrupo = `${grupo}${j}`; // A1, A2, A3, ...
-
-            // Checkbox para el subgrupo
-            const labelSubgrupo = document.createElement("label");
-            const checkboxSubgrupo = document.createElement("input");
-            checkboxSubgrupo.type = "checkbox";
-            checkboxSubgrupo.value = subgrupo;
-            checkboxSubgrupo.id = `subgrupo-${codigo}-${grupo}-${j}`;
-            labelSubgrupo.appendChild(checkboxSubgrupo);
-            labelSubgrupo.appendChild(document.createTextNode(subgrupo));
-            contenedorSubgrupos.appendChild(labelSubgrupo);
-        }
-
-        contenedorSubgrupos.style.display = "block"; // Mostrar subgrupos
-    }
+   function mostrarSubgrupos(contenedor, codigo, grupo, subgrupos) {
+  const contenedorSubgrupos = document.getElementById(`subgrupos-${codigo}-${grupo}`);
+  contenedorSubgrupos.innerHTML = "";
+  
+  const subgruposDiv = document.createElement('div');
+  subgruposDiv.className = 'subgrupos-grid';
+  
+  for (let j = 1; j <= subgrupos; j++) {
+      const subgrupo = `${grupo}${j}`;
+      
+      const subgrupoItem = document.createElement('div');
+      subgrupoItem.className = 'subgrupo-item';
+      
+      const labelSubgrupo = document.createElement("label");
+      labelSubgrupo.className = 'subgrupo-label';
+      
+      const checkboxSubgrupo = document.createElement("input");
+      checkboxSubgrupo.type = "checkbox";
+      checkboxSubgrupo.value = subgrupo;
+      checkboxSubgrupo.id = `subgrupo-${codigo}-${grupo}-${j}`;
+      
+      labelSubgrupo.appendChild(checkboxSubgrupo);
+      labelSubgrupo.appendChild(document.createTextNode(subgrupo));
+      
+      subgrupoItem.appendChild(labelSubgrupo);
+      subgruposDiv.appendChild(subgrupoItem);
+  }
+  
+  contenedorSubgrupos.appendChild(subgruposDiv);
+  contenedorSubgrupos.style.display = "block";
+  
+  // Animación
+  contenedorSubgrupos.style.animation = 'fadeIn 0.3s ease-out';
+}
 
     // Función para generar la tabla de horarios
     document.getElementById("mostrarHorario").addEventListener("click", function () {
@@ -1530,18 +1564,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
                             if (checkboxSubgrupo && checkboxSubgrupo.checked) {
                                 const horariosEspecificos = horariosMaterias[codigo]?.[subgrupo]?.[dia];
-                                if (horariosEspecificos && horariosEspecificos.includes(horario)) {
-                                    contenido += `<strong>${materias[codigo].nombre}</strong><br>`;
-                                    contenido += `${subgrupo}<br>`;
-
-                                    // Agregar texto personalizado si existe
-                                    const textoPersonalizado = textosPersonalizados[codigo]?.[subgrupo];
-                                    if (textoPersonalizado) {
-                                        contenido += `${textoPersonalizado}<br>`;
-                                    }
-
-                                    horariosCruzados.push({ materia: materias[codigo].nombre, subgrupo, codigo, grupo });
-                                }
+if (horariosEspecificos && horariosEspecificos.includes(horario)) {
+    const nombreMateria = materias[codigo].nombre;
+    const grupoCompleto = subgrupo; // Ejemplo: "D2"
+    const docente = textosPersonalizados[codigo]?.[subgrupo] || '';
+    
+    contenido += `<div class="materia-info">
+                    <div class="nombre-materia">${nombreMateria}</div>
+                    <div class="grupo-docente">Grupo ${grupoCompleto}${docente ? ' - ' + docente : ''}</div>
+                  </div>`;
+    
+    horariosCruzados.push({ materia: nombreMateria, subgrupo, codigo, grupo });
+}
                             }
                         }
                     }
@@ -1570,4 +1604,8 @@ document.addEventListener("DOMContentLoaded", function () {
             tabla.appendChild(fila);
         });
     });
+// Botón para volver al inicio
+document.getElementById('inicioBtn').addEventListener('click', function() {
+    window.location.href = 'index.html';
+});
 });
