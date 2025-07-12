@@ -1,88 +1,362 @@
-	body {
-		font-family: Segoe UI, sans-serif;
-		font-size: 12px;
-	}
-
-	#contenedor-anos, #contenedor-materias {
-		display: flex;
-		justify-content: space-around;
-		margin-top: 10px;
-	}
-
-	.columna-ano, .columna-materia {
-		width: 100%;
-		border: 1px solid #ddd;
-		padding: 2px;
-		border-radius: 5px;
-		text-align: center;
-	}
-
-	.columna-ano h2, .columna-materia h2 {
-		margin: 1px;
-		padding: 5px;
-		background-color: #f2f2f2;
-		border-radius: 5px;
-		cursor: pointer;
-	}
-
-	.materias-ano, .grupos-subgrupos {
-		margin-top: 1px;
-	}
-
-	.materia, .grupo, .subgrupo {
-		padding: 5px;
-		margin: 5px 0;
-		border: 1px solid #ddd;
-		border-radius: 3px;
-		cursor: pointer;
-	}
-
-	.materia:hover, .grupo:hover, .subgrupo:hover {
-		background-color: #f2f2f2;
-	}
-
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		margin-top: 20px;
-	}
-
-	th, td {
-		border: 1px solid #ddd;
-		padding: 8px;
-		text-align: center;
-	}
-
-	th {
-		background-color: #f2f2f2;
-	}button {
-    padding: 10px 20px;
-    font-size: 14px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin: 5px;
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --dark-color: #2c3e50;
+  --light-color: #ecf0f1;
+  --danger-color: #e74c3c;
+  --warning-color: #f39c12;
 }
+
+body {
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 12px;
+  line-height: 1;
+  color: #333;
+  background-color: #f5f7fa;
+  margin: 0;
+  padding: 10px;
+}
+
+h2 {
+  color: var(--dark-color);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+#contenedor-anos, #contenedor-materias {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.columna-ano, .columna-materia {
+  flex: 1;
+  min-width: 200px;
+  border: 1px solid #e0e0e0;
+  padding: 5px;
+  border-radius: 8px;
+  text-align: center;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.columna-ano:hover, .columna-materia:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.columna-ano h2, .columna-materia h2 {
+  margin: 0;
+  padding: 12px;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.columna-ano h2:hover {
+  background-color: #2980b9;
+}
+
+.materias-ano, .grupos-subgrupos {
+  margin-top: 15px;
+  text-align: left;
+}
+
+.materia, .grupo, .subgrupo {
+  padding: 2px;
+  margin: 8px 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  background: white;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.materia:hover, .grupo:hover, .subgrupo:hover {
+  background-color: #f8f9fa;
+  border-color: var(--primary-color);
+}
+
+.materia input[type="checkbox"], 
+.grupo input[type="checkbox"], 
+.subgrupo input[type="checkbox"] {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 25px;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+  background: white;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+th, td {
+  border: 1px solid #e0e0e0;
+  padding: 12px;
+  text-align: center;
+  font-size: 13px;
+}
+
+th {
+  background-color: var(--dark-color);
+  color: white;
+  font-weight: 500;
+}
+
+tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+button {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 #continuar {
-    background-color: #4CAF50; /* Verde */
-    color: white;
+  background-color: var(--secondary-color);
+  color: white;
 }
 
 #continuar:hover {
-    background-color: #45a049;
-    transform: scale(1.05);
+  background-color: #27ae60;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
 }
 
 #mostrarHorario {
-    background-color: #008CBA; /* Azul */
-    color: white;
+  background-color: var(--primary-color);
+  color: white;
 }
+
 #mostrarHorario:hover {
-    background-color: #0077A3;
-    transform: scale(1.05);
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
 }
 
 button:active {
-    transform: scale(0.95);
+  transform: translateY(0);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.columna-ano, .columna-materia, table {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #contenedor-anos, #contenedor-materias {
+    flex-direction: column;
+  }
+  
+  .columna-ano, .columna-materia {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+}
+
+/* Tooltip para los profesores */
+td[title]:hover:after {
+  content: attr(title);
+  padding: 5px 10px;
+  color: #fff;
+  background-color: #333;
+  border-radius: 4px;
+  position: absolute;
+  z-index: 1000;
+  font-size: 12px;
+}
+
+/* Mejoras para la tabla de horarios */
+td {
+  position: relative;
+  min-width: 120px;
+  vertical-align: top;
+}
+
+td strong {
+  display: block;
+  margin-bottom: 3px;
+}
+
+/* Estilo para cruce de horarios */
+.cruce-horario {
+  background-color: #ffebee !important;
+  color: #c62828 !important;
+  font-weight: bold;
+}
+
+/* Estilo para los checkboxes modernos */
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #bdc3c7;
+  border-radius: 4px;
+  outline: none;
+  transition: all 0.2s;
+  position: relative;
+  cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+input[type="checkbox"]:checked:after {
+  content: "✓";
+  position: absolute;
+  color: white;
+  font-size: 10px;
+  left: 3px;
+  top: 0;
+}
+/* Estilos para los grupos y docentes */
+.grupo-container {
+    margin-bottom: 5px;
+    padding: 2px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+}
+
+.grupo-label {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.docente-nombre {
+    font-size: 12px;
+    color: #55288e;
+}
+
+.subgrupos-container {
+    margin-top: 5px;
+    margin-left: 20px;
+}
+
+.subgrupo-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+}
+
+/* Estilos para la visualización en la tabla de horarios */
+.materia-horario {
+    font-weight: bold;
+    margin-bottom: 3px;
+    font-size: 12px;
+}
+
+.grupo-docente {
+    font-size: 11px;
+    color: #555;
+}
+
+/* Ajustar el padding de las celdas */
+td {
+    padding: 6px 8px !important;
+}
+/* Estilos mejorados para la tabla de horarios */
+.materia-info {
+    line-height: 1.3;
+    padding: 3px 0;
+}
+
+.nombre-materia {
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 3px;
+    color: #2c3e50;
+    letter-spacing: 0.3px;
+}
+
+.grupo-docente {
+    font-size: 11px;
+    color: #555;
+    align-items: center;
+    padding-left: 2px;
+}
+
+/* Viñeta decorativa opcional (puedes eliminarla si lo prefieres) */
+.grupo-docente::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+/* Ajustes generales para celdas */
+td {
+    padding: 8px 10px !important;
+    line-height: 1.3 !important;
+    vertical-align: middle !important;
+}
+
+/* Estilo para el botón Inicio */
+#inicioBtn {
+    background-color: #9b59b6; /* Color morado */
+    color: white;
+    padding: 12px 24px;
+    margin: 5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+#inicioBtn:hover {
+    background-color: #8e44ad;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(155, 89, 182, 0.3);
+}
+
+#inicioBtn:active {
+    transform: translateY(0);
+}
+
+/* Opcional: Botón flotante en esquina */
+#inicioBtn.flotante {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
