@@ -1582,15 +1582,18 @@ if (horariosEspecificos && horariosEspecificos.includes(horario)) {
                 });
 
                 // Si hay más de un horario cruzado, destacar en rojo
-                if (horariosCruzados.length > 1) {
-    td.style.backgroundColor = "#FFFFFF"; // Fondo rojo
-    td.style.color = "#FF0000"; // Letras blancas
-    contenido = "Cruce de grupos<br>" + 
+if (horariosCruzados.length > 1) {
+    td.style.backgroundColor = "#FFFFFF"; // Fondo blanco
+    td.style.color = "#FF0000"; // Texto en rojo
+    contenido = "<div style='text-align: center; margin-bottom: 5px; font-weight: bold; color: #FF0000;'> ⛔CRUCE DE GRUPOS</div>" + 
         horariosCruzados.map(h => {
             const textoPersonalizado = textosPersonalizados[h.codigo]?.[h.subgrupo];
-            return `<strong>${h.materia}</strong><br>${h.subgrupo}<br>${textoPersonalizado || ''}`;
-        }).join("<br>");
-                } else if (horariosCruzados.length === 1) {
+            return `<div style='margin-bottom: 5px;'>
+                      <div style='font-weight: 600;'>${materias[h.codigo].nombre}</div>
+                      <div>Grupo ${h.subgrupo}${textoPersonalizado ? ' - ' + textoPersonalizado : ''}</div>
+                    </div>`;
+        }).join("");
+} else if (horariosCruzados.length === 1) {
                     // Aplicar el color de fondo del grupo
                     const codigoMateria = horariosCruzados[0].codigo;
                     const grupo = horariosCruzados[0].grupo;
