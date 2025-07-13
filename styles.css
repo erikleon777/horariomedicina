@@ -360,3 +360,140 @@ td {
     z-index: 1000;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
+
+/* Controles de impresión */
+.print-controls {
+    margin: 15px 0;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+#printBtn {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+#printBtn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+select {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background-color: white;
+}
+
+/* Estilos específicos para impresión */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #horario, #horario * {
+        visibility: visible;
+    }
+    #horario {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        border: none;
+        box-shadow: none;
+    }
+    .no-print {
+        display: none !important;
+    }
+}
+
+/* Estilos para exportación HD */
+.hd-export {
+    transform: scale(1.5);
+    transform-origin: top left;
+    width: 66.66%;
+}
+
+.hd-export td, .hd-export th {
+    padding: 12px !important;
+    font-size: 14px !important;
+    border: 2px solid #333 !important;
+}
+
+.hd-export .materia-info {
+    padding: 6px !important;
+}
+
+.hd-export .nombre-materia {
+    font-size: 15px !important;
+    margin-bottom: 4px !important;
+}
+
+.hd-export .grupo-docente {
+    font-size: 13px !important;
+}
+
+#wallpaperBtn {
+    background-color: #9b59b6;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin: 10px 0;
+}
+
+#wallpaperBtn:hover {
+    background-color: #8e44ad;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(155, 89, 182, 0.3);
+}
+
+/* Estilo para celdas con cruce de horarios */
+.cruce-horario {
+    background-color: #fff5f5 !important;
+    border: 2px solid #ffcccc !important;
+}
+
+.cruce-horario-titulo {
+    font-weight: bold;
+    color: #d32f2f;
+    text-align: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.cruce-materia {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #ffcccc;
+}
+
+.cruce-materia:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.cruce-nombre-materia {
+    font-weight: 600;
+    font-size: 12px;
+    color: #333;
+}
+
+.cruce-grupo-docente {
+    font-size: 11px;
+    color: #555;
+    padding-left: 10px;
+}
