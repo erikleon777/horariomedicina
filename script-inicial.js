@@ -1,3 +1,21 @@
+// Añade al inicio de script-inicial.js y script.js
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        document.getElementById('skeleton-loader').style.opacity = '0';
+        setTimeout(function() {
+            document.getElementById('skeleton-loader').remove();
+        }, 300);
+    }, 800);
+});
+// Añade al inicio de script-inicial.js y script.js
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        document.getElementById('skeleton-loader').style.opacity = '0';
+        setTimeout(function() {
+            document.getElementById('skeleton-loader').remove();
+        }, 300);
+    }, 800);
+});
 document.addEventListener("DOMContentLoaded", function () {
     // Datos de las materias por año (puedes agregar más años y materias)
     const materiasPorAno = {
