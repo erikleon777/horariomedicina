@@ -43,7 +43,6 @@ document.addEventListener("DOMContentLoaded", function () {
         "MED203": { nombre: "MED 203 - BIOQUÍMICA MÉDICA", grupos: 7, subgrupos: 3 },
         "MED209": { nombre: "MED 209 - PARASITOLOGÍA Y MICOLOGÍA MÉDICA", grupos: 6, subgrupos: 3 },
         "SAP200": { nombre: "SAP 200 - SALUD PÚBLICA II", grupos: 6, subgrupos: 1 },
-        "SAP300": { nombre: "SAP 300 - SALUD PÚBLICA III", grupos: 3, subgrupos: 1 },
         "MED301": { nombre: "MED 301 - FISIOPATOLOGÍA", grupos: 4, subgrupos: 1 },
         "MED304": { nombre: "MED 304 - INFECTOLOGÍA Y MEDICINA TRADICIONAL", grupos: 4, subgrupos: 5 },
         "CIR305": { nombre: "CIR 305 - CIRUGÍA I", grupos: 4, subgrupos: 5 },
@@ -1546,7 +1545,8 @@ function mostrarGruposYSubgrupos(contenedor, codigo, materia) {
 }
 
     // Función para generar la tabla de horarios
-document.getElementById("mostrarHorario").addEventListener("click", function () {
+// Función para generar la tabla de horarios (versión completa)
+function generarHorarioCompleto() {
     const tabla = document.getElementById("horario");
     tabla.innerHTML = ""; // Limpiar tabla
 
@@ -1565,12 +1565,12 @@ document.getElementById("mostrarHorario").addEventListener("click", function () 
     // Objeto para almacenar el contenido de cada celda
     const contenidoCeldas = {};
 
-    // Primero, recolectar todo el contenido
+    // Recolectar todo el contenido
     materiasSeleccionadas.forEach(codigo => {
         for (let i = 0; i < materias[codigo].grupos; i++) {
-            const grupo = String.fromCharCode(65 + i); // A, B, C, ...
+            const grupo = String.fromCharCode(65 + i);
             for (let j = 1; j <= materias[codigo].subgrupos; j++) {
-                const subgrupo = `${grupo}${j}`; // A1, A2, A3, ...
+                const subgrupo = `${grupo}${j}`;
                 const checkboxSubgrupo = document.getElementById(`subgrupo-${codigo}-${grupo}-${j}`);
 
                 if (checkboxSubgrupo && checkboxSubgrupo.checked) {
@@ -1604,7 +1604,7 @@ document.getElementById("mostrarHorario").addEventListener("click", function () 
         }
     });
 
-    // Crear fila de días (siempre mostrar todas las columnas)
+    // Crear fila de días
     const filaDias = document.createElement("tr");
     filaDias.appendChild(document.createElement("th")); // Celda vacía para los horarios
     todosLosDias.forEach(dia => {
@@ -1614,9 +1614,6 @@ document.getElementById("mostrarHorario").addEventListener("click", function () 
     });
     tabla.appendChild(filaDias);
 
-    // Función para obtener el índice de un horario
-    const getHorarioIndex = (horario) => todosLosHorarios.indexOf(horario);
-
     // Agrupar horarios consecutivos vacíos
     let horariosAgrupados = [];
     let grupoActual = {
@@ -1625,12 +1622,10 @@ document.getElementById("mostrarHorario").addEventListener("click", function () 
         vacio: true
     };
 
-    // Verificar si cada horario tiene contenido
     for (let i = 0; i < todosLosHorarios.length; i++) {
         const horario = todosLosHorarios[i];
         let tieneContenido = false;
 
-        // Verificar si este horario tiene contenido en algún día
         for (const dia of todosLosDias) {
             const key = `${horario}-${dia}`;
             if (contenidoCeldas[key] && contenidoCeldas[key].length > 0) {
@@ -1640,29 +1635,24 @@ document.getElementById("mostrarHorario").addEventListener("click", function () 
         }
 
         if (tieneContenido) {
-            // Si encontramos contenido, finalizamos el grupo vacío actual (si existe)
             if (grupoActual.vacio && grupoActual.inicio !== horario) {
                 horariosAgrupados.push(grupoActual);
             }
-            // Agregamos el horario con contenido como un grupo individual
             horariosAgrupados.push({
                 inicio: horario,
                 fin: horario,
                 vacio: false
             });
-            // Empezamos un nuevo grupo vacío
             grupoActual = {
                 inicio: todosLosHorarios[i + 1] || horario,
                 fin: todosLosHorarios[i + 1] || horario,
                 vacio: true
             };
         } else {
-            // Continuamos el grupo vacío actual
             grupoActual.fin = horario;
         }
     }
 
-    // Agregar el último grupo si es vacío
     if (grupoActual.vacio && grupoActual.inicio !== grupoActual.fin) {
         horariosAgrupados.push(grupoActual);
     }
@@ -1699,7 +1689,6 @@ document.getElementById("mostrarHorario").addEventListener("click", function () 
                         horariosCruzados.push(item);
                     });
 
-                    // Si hay más de un horario cruzado, destacar en rojo
                     if (horariosCruzados.length > 1) {
                         td.style.backgroundColor = "#FFFFFF";
                         td.style.color = "#FF0000";
@@ -1711,7 +1700,6 @@ document.getElementById("mostrarHorario").addEventListener("click", function () 
                                 </div>`;
                             }).join("");
                     } else if (horariosCruzados.length === 1) {
-                        // Aplicar el color de fondo del grupo
                         const codigoMateria = horariosCruzados[0].codigo;
                         const grupoLetra = horariosCruzados[0].grupo;
                         td.style.backgroundColor = coloresGrupos[codigoMateria]?.[grupoLetra] || "#FFFFFF";
@@ -1727,14 +1715,219 @@ document.getElementById("mostrarHorario").addEventListener("click", function () 
         tabla.appendChild(fila);
     });
 
-    // Si no hay ningún horario con contenido, mostrar mensaje
     if (horariosAgrupados.length === 0 || horariosAgrupados.every(g => g.vacio)) {
         tabla.innerHTML = "<tr><td colspan='7' style='text-align: center; padding: 20px;'>No hay horarios para mostrar con las selecciones actuales</td></tr>";
     }
+}
+
+// Función para generar la tabla de horarios (versión reducida)
+// Función para generar la tabla de horarios (versión reducida mejorada)
+function generarHorarioReducido() {
+    const tabla = document.getElementById("horario");
+    tabla.innerHTML = ""; // Limpiar tabla
+
+    // Definir todos los horarios y días posibles
+    const todosLosHorarios = [
+        "07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00",
+        "10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00",
+        "13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00",
+        "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00",
+        "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00",
+        "22:00 - 22:45"
+    ];
+
+    const diasReducidos = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
+    const diasCompletos = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+    // Objeto para almacenar el contenido de cada celda
+    const contenidoCeldas = {};
+
+    // Recolectar todo el contenido
+    materiasSeleccionadas.forEach(codigo => {
+        for (let i = 0; i < materias[codigo].grupos; i++) {
+            const grupo = String.fromCharCode(65 + i);
+            for (let j = 1; j <= materias[codigo].subgrupos; j++) {
+                const subgrupo = `${grupo}${j}`;
+                const checkboxSubgrupo = document.getElementById(`subgrupo-${codigo}-${grupo}-${j}`);
+
+                if (checkboxSubgrupo && checkboxSubgrupo.checked) {
+                    diasCompletos.forEach((dia, index) => {
+                        const horariosEspecificos = horariosMaterias[codigo]?.[subgrupo]?.[dia];
+                        if (horariosEspecificos) {
+                            horariosEspecificos.forEach(horario => {
+                                if (todosLosHorarios.includes(horario)) {
+                                    const key = `${horario}-${diasReducidos[index]}`;
+                                    if (!contenidoCeldas[key]) {
+                                        contenidoCeldas[key] = [];
+                                    }
+                                    
+                                    contenidoCeldas[key].push({
+                                        codigo,
+                                        grupoCompleto: subgrupo,
+                                        grupo
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        }
+    });
+
+    // Crear fila de días reducidos
+    const filaDias = document.createElement("tr");
+    filaDias.appendChild(document.createElement("th")); // Celda vacía para los horarios
+    diasReducidos.forEach(dia => {
+        const th = document.createElement("th");
+        th.textContent = dia;
+        th.style.width = "60px"; // Ancho reducido para las columnas
+        filaDias.appendChild(th);
+    });
+    tabla.appendChild(filaDias);
+
+    // Agrupar horarios consecutivos vacíos
+    let horariosAgrupados = [];
+    let grupoActual = {
+        inicio: todosLosHorarios[0],
+        fin: todosLosHorarios[0],
+        vacio: true
+    };
+
+    for (let i = 0; i < todosLosHorarios.length; i++) {
+        const horario = todosLosHorarios[i];
+        let tieneContenido = false;
+
+        for (const dia of diasReducidos) {
+            const key = `${horario}-${dia}`;
+            if (contenidoCeldas[key] && contenidoCeldas[key].length > 0) {
+                tieneContenido = true;
+                break;
+            }
+        }
+
+        if (tieneContenido) {
+            if (grupoActual.vacio && grupoActual.inicio !== horario) {
+                horariosAgrupados.push(grupoActual);
+            }
+            horariosAgrupados.push({
+                inicio: horario,
+                fin: horario,
+                vacio: false
+            });
+            grupoActual = {
+                inicio: todosLosHorarios[i + 1] || horario,
+                fin: todosLosHorarios[i + 1] || horario,
+                vacio: true
+            };
+        } else {
+            grupoActual.fin = horario;
+        }
+    }
+
+    if (grupoActual.vacio && grupoActual.inicio !== grupoActual.fin) {
+        horariosAgrupados.push(grupoActual);
+    }
+
+    // Crear filas para los horarios agrupados
+    horariosAgrupados.forEach(grupo => {
+        const fila = document.createElement("tr");
+        const th = document.createElement("th");
+        
+        if (grupo.inicio === grupo.fin) {
+            th.textContent = grupo.inicio;
+        } else {
+            th.textContent = `${grupo.inicio.split(" - ")[0]} - ${grupo.fin.split(" - ")[1]}`;
+        }
+        
+        fila.appendChild(th);
+
+        diasReducidos.forEach(dia => {
+            const td = document.createElement("td");
+            td.style.width = "60px"; // Ancho reducido para las celdas
+            
+            if (!grupo.vacio) {
+                const key = `${grupo.inicio}-${dia}`;
+                const contenido = contenidoCeldas[key];
+
+                if (contenido && contenido.length > 0) {
+                    let htmlContent = "";
+                    let horariosCruzados = [];
+
+                    contenido.forEach(item => {
+                        horariosCruzados.push(item);
+                    });
+
+                    if (horariosCruzados.length > 1) {
+                        td.style.backgroundColor = "#FFFFFF";
+                        td.style.color = "#FF0000";
+                        // Mostrar todas las materias que se cruzan
+                        htmlContent = "CRUCE:<br>" + 
+                            horariosCruzados.map(h => {
+                                return `${h.codigo} ${h.grupoCompleto}`;
+                            }).join("<br>");
+                    } else if (horariosCruzados.length === 1) {
+                        const codigoMateria = horariosCruzados[0].codigo;
+                        const grupoLetra = horariosCruzados[0].grupo;
+                        td.style.backgroundColor = coloresGrupos[codigoMateria]?.[grupoLetra] || "#FFFFFF";
+                        htmlContent = `${codigoMateria}<br>${horariosCruzados[0].grupoCompleto}`;
+                    }
+
+                    td.innerHTML = htmlContent;
+                    td.style.textAlign = "center";
+                    td.style.fontSize = "12px";
+                    td.style.padding = "5px";
+                    td.style.wordWrap = "break-word";
+                }
+            }
+
+            fila.appendChild(td);
+        });
+
+        tabla.appendChild(fila);
+    });
+
+    if (horariosAgrupados.length === 0 || horariosAgrupados.every(g => g.vacio)) {
+        tabla.innerHTML = "<tr><td colspan='7' style='text-align: center; padding: 20px;'>No hay horarios para mostrar con las selecciones actuales</td></tr>";
+    }
+
+    // Guardar el estado actual como reducido
+    tabla.dataset.modo = "reducido";
+}
+
+// Modificar el event listener para el redimensionamiento
+window.addEventListener('resize', function() {
+    const tabla = document.getElementById('horario');
+    if (tabla.innerHTML !== '') {
+        if (tabla.dataset.modo === "reducido") {
+            generarHorarioReducido();
+        } else {
+            generarHorarioCompleto();
+        }
+    }
 });
-// Botón para volver al inicio
+
+// Modificar el event listener del botón existente
+document.getElementById("mostrarHorario").addEventListener("click", function() {
+    const tabla = document.getElementById("horario");
+    generarHorarioCompleto();
+    tabla.dataset.modo = "completo";
+});
+
+// Agregar event listener para el nuevo botón
+document.getElementById("mostrarHorarioReducido").addEventListener("click", function() {
+    const tabla = document.getElementById("horario");
+    generarHorarioReducido();
+    tabla.dataset.modo = "reducido";
+});// Botón para volver al inicio
 document.getElementById('inicioBtn').addEventListener('click', function() {
     window.location.href = 'index.html';
 });
 });
 
+// Al final de tu script.js
+window.addEventListener('resize', function() {
+    if (document.getElementById('horario').innerHTML !== '') {
+        document.getElementById('mostrarHorario').click();
+    }
+});
