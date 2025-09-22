@@ -65,7 +65,7 @@ h2 {
 }
 
 .materias-ano, .grupos-subgrupos {
-  margin-top: 15px;
+  margin-top: 0px;
   text-align: left;
 }
 
@@ -1010,3 +1010,4 @@ button {
     font-size: 11px !important;
     line-height: 1.2 !important;
 }
+
