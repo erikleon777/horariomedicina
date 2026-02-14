@@ -42,8 +42,8 @@
         }
 
         .columna-ano, .columna-materia {
-    flex: 1 1 0;                    /* ← Distribuye el espacio equitativamente */
-    min-width: 0;                   /* ← Permite que se encojan más */
+    flex: 1 1 0;
+    min-width: 200px; /* Cambia de 0 a 200px para dar espacio al texto */
     border: 1px solid #e2e8f0;
     padding: 2px;
     border-radius: 10px;
@@ -57,25 +57,69 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.06);
             border-color: #cbd5e1;
         }
+.columna-materia div {
+    margin: 8px 0;
+    padding: 0 4px;
+}
 
+/* Asegurar que las etiquetas de los grupos se vean bien */
+.columna-materia label {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    font-size: 11px;
+    display: inline-block;
+    max-width: calc(100% - 25px); /* Dejar espacio para el checkbox */
+    vertical-align: middle;
+}
+
+/* Mejorar el contenedor de subgrupos */
+[id^="subgrupos-"] {
+    margin: 5px 0 5px 15px !important;
+    padding: 4px !important;
+    background: #f8fafc;
+    border-radius: 6px;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Estilo para los subgrupos */
+[id^="subgrupos-"] label {
+    display: inline-block;
+    margin: 3px !important;
+    padding: 3px 8px !important;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    font-size: 10px;
+    white-space: nowrap; /* Mantener los subgrupos en una línea */
+}
         .columna-ano h2, .columna-materia h2 {
-            margin: 1px;
-            padding: 8px 5px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 500;
-            color: #0f172a;
-            border-bottom: 1px solid #e2e8f0;
-        }
+    margin: 1px;
+    padding: 8px 5px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #0f172a;
+    border-bottom: 1px solid #e2e8f0;
+    /* Agrega estas propiedades para el texto */
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.2;
+    height: auto;
+    min-height: 40px; /* Altura mínima para dar espacio al texto */
+}
 
         .materias-ano, .grupos-subgrupos {
             margin-top: 1px;
             padding: 4px;
         }
 
-        .materia {
+.materia {
     padding: 4px 6px;
     margin: 4px 0;
     border: 1px solid #e2e8f0;
@@ -222,6 +266,41 @@
                 padding-bottom: 8px;
             }
         }
+@media (max-width: 768px) {
+    #contenedor-anos {
+        flex-wrap: wrap; /* Permite que las columnas bajen a la siguiente línea si no caben */
+    }
+    
+    .columna-ano {
+        min-width: 150px; /* Ancho mínimo para cada columna en móvil */
+    }
+    
+    .materia {
+        font-size: 10px; /* Reduce un poco el texto en móvil */
+        padding: 3px 4px;
+    }
+}
+@media (max-width: 768px) {
+    #contenedor-materias {
+        flex-direction: column; /* En móvil, las columnas se apilan verticalmente */
+    }
+    
+    .columna-materia {
+        min-width: 100%; /* Ocupar todo el ancho en móvil */
+        margin-bottom: 10px;
+    }
+    
+    .columna-materia h2 {
+        font-size: 14px; /* Texto más grande en móvil */
+        min-height: auto;
+        padding: 12px 8px;
+    }
+    
+    [id^="subgrupos-"] label {
+        white-space: nowrap; /* Subgrupos en línea horizontal */
+        font-size: 11px;
+    }
+}
     </style>
 </head>
 <body>
