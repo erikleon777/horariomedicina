@@ -330,15 +330,19 @@
     </div>
 </div>
 <br>
-<button id="continuar" onclick="redirigirAHorario()">Continuar</button>
+<div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+    <button id="continuar" onclick="redirigirAHorario()">Continuar</button>
+    <button id="constructorBtn" onclick="iniciarConstructorHorario()" style="background: linear-gradient(135deg, #a855f7, #9333ea); color: white;">🛠️ Constructor de Horario</button>
+    <button id="btnInicio" onclick="volverAlInicioCompleto()" style="background: linear-gradient(135deg, #64748b, #475569); color: white;">🏠 Volver al Inicio</button>
+</div>
 
 <!-- ========== horario.html (contenedor de materias + tabla) ========== -->
 <div id="contenedor-materias" style="display: none;"></div>
 
-<!-- Contenedor de botones (oculto inicialmente) -->
 <div id="botones-horario" style="display: none; gap: 10px; justify-content: center; margin: 10px 0;">
     <button id="mostrarHorario">Mostrar Horario</button>
-    <button id="btnRegresar" onclick="volverAlMenu()">Regresar al menú</button>
+    <button id="btnRegresar" onclick="volverAlMenu()">← Regresar al menú</button>
+    <button id="btnInicioDesdeHorario" onclick="volverAlInicioCompleto()" style="background: #64748b; color: white;">🏠 Volver al Inicio</button>
 </div>
 
 <table id="horario" style="display: none;">
@@ -2859,7 +2863,7 @@ const coloresGrupos = {
     }
 };
 
-    // Función para mostrar materias de un año
+// Función para mostrar materias de un año
     window.mostrarMaterias = function(ano) {
         const contenedorMaterias = document.getElementById(`materias-${ano}`);
         contenedorMaterias.innerHTML = "";
@@ -2883,7 +2887,6 @@ const coloresGrupos = {
 
     // Función para redirigir a la pantalla de horario
     window.redirigirAHorario = function() {
-        // Limpiar cualquier residuo de la sesión anterior
         document.querySelector('#contenedor-materias').innerHTML = '';
         
         const materiasSeleccionadas = [];
@@ -2899,21 +2902,27 @@ const coloresGrupos = {
     };
 
     // Función auxiliar para mostrar subgrupos
-    window.mostrarSubgrupos = function(contenedor, codigo, grupo, subgrupos) {
-        const contenedorSub = document.getElementById(`subgrupos-${codigo}-${grupo}`);
+    window.mostrarSubgrupos = function(columnaMateria, codigo, grupo, subgruposTotales) {
+        const contenedorSub = columnaMateria.querySelector(`#subgrupos-${codigo}-${grupo}`);
         if (!contenedorSub) return;
+
         contenedorSub.innerHTML = "";
-        for (let j = 1; j <= subgrupos; j++) {
+
+        for (let j = 1; j <= subgruposTotales; j++) {
             const subgrupo = `${grupo}${j}`;
             const label = document.createElement("label");
             const cb = document.createElement("input");
+            
             cb.type = "checkbox";
             cb.value = subgrupo;
             cb.id = `subgrupo-${codigo}-${grupo}-${j}`;
+            
             label.appendChild(cb);
             label.appendChild(document.createTextNode(" " + subgrupo));
+            
             contenedorSub.appendChild(label);
         }
+        
         contenedorSub.style.display = "block";
     };
 
@@ -2953,7 +2962,7 @@ const coloresGrupos = {
                 checkboxGrupo.value = grupo;
                 checkboxGrupo.id = `grupo-${codigo}-${grupo}`;
                 checkboxGrupo.addEventListener("change", function() {
-                    mostrarSubgrupos(contenedorMaterias, codigo, grupo, materia.subgrupos);
+                    mostrarSubgrupos(columnaMateria, codigo, grupo, materia.subgrupos);
                 });
                 
                 const labelGrupo = document.createElement("label");
@@ -3071,30 +3080,542 @@ const coloresGrupos = {
         };
     }
 
-    // Función para volver al menú principal
-    window.volverAlMenu = function() {
+    // Función para calcular combinaciones óptimas sin cruces
+    window.calcularCombinacionesOptimas = function() {
+        const materiasSeleccionadas = [];
+        document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+            materiasSeleccionadas.push(cb.value);
+        });
+        
+        if (materiasSeleccionadas.length === 0) {
+            alert("Por favor, seleccione al menos una materia.");
+            return;
+        }
+
+        // Mostrar mensaje de carga
+        alert(`Buscando horarios para ${materiasSeleccionadas.length} materias...`);
+
+        // Obtener todas las opciones por materia
+        const opcionesPorMateria = {};
+        materiasSeleccionadas.forEach(codigo => {
+            const materia = materias[codigo];
+            if (!materia) return;
+            
+            opcionesPorMateria[codigo] = [];
+            for (let i = 0; i < materia.grupos; i++) {
+                const grupo = String.fromCharCode(65 + i);
+                for (let j = 1; j <= materia.subgrupos; j++) {
+                    opcionesPorMateria[codigo].push(`${grupo}${j}`);
+                }
+            }
+        });
+
+        // Ordenar materias por menor cantidad de opciones
+        const materiasOrdenadas = Object.keys(opcionesPorMateria).sort((a, b) => 
+            opcionesPorMateria[a].length - opcionesPorMateria[b].length
+        );
+
+        // Buscar combinaciones
+        combinacionesEncontradas = [];
+        const LIMITE_COMBINACIONES = 50;
+        
+        function buscarCombinaciones(materiaIndex, combinacionActual, horariosOcupados) {
+            if (combinacionesEncontradas.length >= LIMITE_COMBINACIONES) {
+                return true;
+            }
+            
+            if (materiaIndex >= materiasOrdenadas.length) {
+                combinacionesEncontradas.push({...combinacionActual});
+                return false;
+            }
+            
+            const codigoMateria = materiasOrdenadas[materiaIndex];
+            const opciones = opcionesPorMateria[codigoMateria];
+            
+            for (const subgrupo of opciones) {
+                const horariosSubgrupo = horariosMaterias[codigoMateria]?.[subgrupo];
+                if (!horariosSubgrupo) continue;
+                
+                let tieneCruce = false;
+                const nuevosHorarios = {...horariosOcupados};
+                
+                for (const dia of Object.keys(horariosSubgrupo)) {
+                    for (const hora of horariosSubgrupo[dia]) {
+                        const clave = `${dia}-${hora}`;
+                        if (nuevosHorarios[clave]) {
+                            tieneCruce = true;
+                            break;
+                        }
+                        nuevosHorarios[clave] = true;
+                    }
+                    if (tieneCruce) break;
+                }
+                
+                if (!tieneCruce) {
+                    combinacionActual[codigoMateria] = subgrupo;
+                    const deberiaDetener = buscarCombinaciones(materiaIndex + 1, combinacionActual, nuevosHorarios);
+                    delete combinacionActual[codigoMateria];
+                    
+                    if (deberiaDetener) return true;
+                }
+            }
+            
+            return false;
+        }
+
+        buscarCombinaciones(0, {}, {});
+
+        if (combinacionesEncontradas.length === 0) {
+            alert("No se encontraron horarios sin cruces.");
+            return;
+        }
+
+        document.querySelector('#combinaciones-container').style.display = 'block';
+        document.getElementById('total-combinaciones').textContent = 
+            combinacionesEncontradas.length >= LIMITE_COMBINACIONES 
+            ? `${LIMITE_COMBINACIONES}+` 
+            : combinacionesEncontradas.length;
+        
+        combinacionActual = 0;
+        mostrarCombinacion(combinacionActual);
+    };
+
+    // Función para mostrar una combinación
+    function mostrarCombinacion(indice) {
+        const combinacion = combinacionesEncontradas[indice];
+        if (!combinacion) return;
+        
+        const listaDiv = document.getElementById('combinaciones-lista');
+        listaDiv.innerHTML = '';
+        
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'combinacion-item';
+        if (indice === combinacionActual) {
+            itemDiv.classList.add('selected');
+        }
+        
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'combinacion-header';
+        headerDiv.innerHTML = `<span class="combinacion-numero">Opción ${indice + 1}</span>`;
+        
+        const detalleDiv = document.createElement('div');
+        detalleDiv.className = 'combinacion-detalle';
+        
+        for (const [codigo, subgrupo] of Object.entries(combinacion)) {
+            const materia = materias[codigo];
+            if (!materia) continue;
+            
+            const materiaDiv = document.createElement('div');
+            materiaDiv.className = 'combinacion-materia';
+            const docente = textosPersonalizados[codigo]?.[subgrupo] || 'Docente no asignado';
+            materiaDiv.innerHTML = `<strong>${materia.nombre}</strong><br>Grupo: ${subgrupo}<br>${docente}`;
+            materiaDiv.style.backgroundColor = coloresGrupos[codigo]?.[subgrupo] || "#FFFFFF";
+            detalleDiv.appendChild(materiaDiv);
+        }
+        
+        const footerDiv = document.createElement('div');
+        footerDiv.className = 'combinacion-footer';
+        footerDiv.innerHTML = `Total de materias: ${Object.keys(combinacion).length}`;
+        
+        itemDiv.appendChild(headerDiv);
+        itemDiv.appendChild(detalleDiv);
+        itemDiv.appendChild(footerDiv);
+        
+        itemDiv.onclick = function() {
+            combinacionActual = indice;
+            mostrarCombinacion(indice);
+        };
+        
+        listaDiv.appendChild(itemDiv);
+        
+        document.getElementById('combinacion-actual').textContent = `${indice + 1} / ${combinacionesEncontradas.length}`;
+        document.getElementById('prevCombinacion').disabled = indice === 0;
+        document.getElementById('nextCombinacion').disabled = indice === combinacionesEncontradas.length - 1;
+    }
+
+    // Función para navegar entre combinaciones
+    window.navegarCombinacion = function(direccion) {
+        const nuevoIndice = combinacionActual + direccion;
+        if (nuevoIndice >= 0 && nuevoIndice < combinacionesEncontradas.length) {
+            combinacionActual = nuevoIndice;
+            mostrarCombinacion(combinacionActual);
+        }
+    };
+
+    // Función para aplicar una combinación
+    window.aplicarCombinacionSeleccionada = function() {
+        const combinacion = combinacionesEncontradas[combinacionActual];
+        if (!combinacion) return;
+        
+        const materiasSeleccionadas = Object.keys(combinacion);
+        mostrarPantallaHorario(materiasSeleccionadas);
+        
+        setTimeout(() => {
+            for (const [codigo, subgrupo] of Object.entries(combinacion)) {
+                const grupo = subgrupo[0];
+                const numero = subgrupo[1];
+                
+                const grupoCheckbox = document.getElementById(`grupo-${codigo}-${grupo}`);
+                if (grupoCheckbox) {
+                    grupoCheckbox.checked = true;
+                    const columnaMateria = grupoCheckbox.closest('.columna-materia');
+                    if (columnaMateria) {
+                        mostrarSubgrupos(columnaMateria, codigo, grupo, materias[codigo].subgrupos);
+                        
+                        setTimeout(() => {
+                            const subgrupoCheckbox = document.getElementById(`subgrupo-${codigo}-${grupo}-${numero}`);
+                            if (subgrupoCheckbox) {
+                                subgrupoCheckbox.checked = true;
+                            }
+                        }, 100);
+                    }
+                }
+            }
+        }, 500);
+    };
+    // ===== SISTEMA DE CONSTRUCTOR DE HORARIO (FILTROS PROGRESIVOS) =====
+    let estadoConstructor = {
+        materias: [],
+        selecciones: {},
+        modo: 'activo'
+    };
+
+    // Función principal para iniciar el constructor
+    window.iniciarConstructorHorario = function() {
+        const materiasSeleccionadas = [];
+        document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+            materiasSeleccionadas.push(cb.value);
+        });
+        
+        if (materiasSeleccionadas.length === 0) {
+            alert("Por favor, seleccione al menos una materia.");
+            return;
+        }
+
+        // Ocultar elementos del menú principal
+        document.querySelector('#contenedor-anos').style.display = 'none';
+        document.querySelector('#continuar').style.display = 'none';
+        document.querySelector('h2').style.display = 'none';
+        
+        // Eliminar constructor anterior si existe
+        const panelAnterior = document.getElementById('constructor-panel');
+        if (panelAnterior) panelAnterior.remove();
+
+        // Crear panel de construcción
+        const panel = document.createElement('div');
+        panel.id = 'constructor-panel';
+        panel.innerHTML = `
+            <div style="background: white; padding: 25px; border-radius: 16px; margin: 20px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; color: #0f172a; font-weight: 600;">🛠️ Constructor de Horario</h3>
+                    <button onclick="cerrarConstructor()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #64748b;">✕</button>
+                </div>
+                
+                <p style="color: #475569; margin-bottom: 20px;">Seleccione grupos para cada materia. El sistema le mostrará solo opciones compatibles:</p>
+                
+                <div id="opciones-dinamicas" style="margin-bottom: 20px;"></div>
+                
+                <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 500; color: #334155;">Horarios posibles:</span>
+                        <span id="contador-opciones" style="font-weight: 700; color: #2563eb; font-size: 18px;">Calculando...</span>
+                    </div>
+                    <div style="margin-top: 10px; height: 4px; background: #e2e8f0; border-radius: 2px;">
+                        <div id="barra-progreso" style="height: 100%; background: #22c55e; border-radius: 2px; width: 0%;"></div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button onclick="completarAutomaticamente()" 
+                            style="background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 12px 24px; border: none; border-radius: 30px; font-weight: 500; cursor: pointer; flex: 1;">
+                        ⚡ Completar Automáticamente
+                    </button>
+                    <button onclick="reiniciarConstructor()" 
+                            style="background: #f1f5f9; color: #334155; padding: 12px 24px; border: 1px solid #cbd5e1; border-radius: 30px; font-weight: 500; cursor: pointer;">
+                        ↻ Reiniciar
+                    </button>
+                    <button onclick="verHorarioActual()" 
+                            style="background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 30px; font-weight: 500; cursor: pointer;">
+                        👁️ Ver Horario
+                    </button>
+                </div>
+                
+                <div style="margin-top: 15px; text-align: center; font-size: 11px; color: #94a3b8;">
+                    Las opciones se actualizan automáticamente según sus selecciones
+                </div>
+            </div>
+        `;
+        
+        // Insertar panel después del contenedor de años
+        document.querySelector('#contenedor-anos').insertAdjacentElement('afterend', panel);
+        
+        // Inicializar constructor
+        estadoConstructor = {
+            materias: materiasSeleccionadas,
+            selecciones: {},
+            modo: 'activo'
+        };
+        
+        actualizarOpcionesConstructor();
+    };
+
+    // Función para cerrar constructor
+    window.cerrarConstructor = function() {
+        document.getElementById('constructor-panel')?.remove();
+        
         // Mostrar elementos del menú principal
         document.querySelector('#contenedor-anos').style.display = 'flex';
         document.querySelector('#continuar').style.display = 'inline-block';
         document.querySelector('h2').style.display = 'block';
+    };
+
+    // Función para actualizar opciones en tiempo real
+    function actualizarOpcionesConstructor() {
+        const contenedor = document.getElementById('opciones-dinamicas');
+        if (!contenedor) return;
         
-        // Ocultar elementos de la pantalla de horario
+        let html = '<div style="display: flex; flex-wrap: wrap; gap: 20px;">';
+        
+        estadoConstructor.materias.forEach(codigo => {
+            const materia = materias[codigo];
+            const seleccionActual = estadoConstructor.selecciones[codigo];
+            const opcionesPosibles = calcularOpcionesPosibles(codigo);
+            
+            html += `
+                <div style="flex: 1; min-width: 250px; background: white; border: 2px solid ${seleccionActual ? '#22c55e' : '#e2e8f0'}; padding: 15px; border-radius: 12px; transition: all 0.2s;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                        <strong style="color: #0f172a; font-size: 12px;">${materia.nombre}</strong>
+                        <span style="background: ${seleccionActual ? '#22c55e20' : '#f1f5f9'}; color: ${seleccionActual ? '#16a34a' : '#64748b'}; padding: 2px 8px; border-radius: 12px; font-size: 10px;">
+                            ${opcionesPosibles.length} opciones
+                        </span>
+                    </div>
+                    
+                    <select onchange="actualizarSeleccion('${codigo}', this.value)" 
+                            style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 8px; font-size: 11px;">
+                        <option value="">Seleccione grupo...</option>
+            `;
+            
+            // Generar opciones ordenadas
+            const opcionesOrdenadas = opcionesPosibles.sort();
+            opcionesOrdenadas.forEach(subgrupo => {
+                const selected = seleccionActual === subgrupo ? 'selected' : '';
+                html += `<option value="${subgrupo}" ${selected}>Grupo ${subgrupo}</option>`;
+            });
+            
+            html += `</select>`;
+            
+            if (seleccionActual) {
+                const docente = textosPersonalizados[codigo]?.[seleccionActual] || '';
+                const color = coloresGrupos[codigo]?.[seleccionActual] || '#f8fafc';
+                html += `
+                    <div style="font-size: 10px; padding: 6px; background: ${color}; border-radius: 6px; margin-top: 5px;">
+                        <span style="color: #1e293b;">📚 ${docente || 'Docente no asignado'}</span>
+                    </div>
+                `;
+            }
+            
+            html += `</div>`;
+        });
+        
+        html += '</div>';
+        contenedor.innerHTML = html;
+        
+        // Actualizar contador y barra de progreso
+        const stats = calcularEstadisticas();
+        document.getElementById('contador-opciones').textContent = stats.total > 1000 ? '1000+' : stats.total;
+        
+        const progreso = (stats.seleccionadas / estadoConstructor.materias.length) * 100;
+        document.getElementById('barra-progreso').style.width = `${progreso}%`;
+    }
+
+    // Función para calcular opciones posibles para una materia
+    function calcularOpcionesPosibles(codigo) {
+        const materia = materias[codigo];
+        const opciones = [];
+        
+        for (let i = 0; i < materia.grupos; i++) {
+            const grupo = String.fromCharCode(65 + i);
+            for (let j = 1; j <= materia.subgrupos; j++) {
+                const subgrupo = `${grupo}${j}`;
+                
+                // Verificar compatibilidad con selecciones actuales
+                let compatible = true;
+                for (const [cod, sel] of Object.entries(estadoConstructor.selecciones)) {
+                    if (cod === codigo) continue;
+                    
+                    const horarios1 = horariosMaterias[codigo]?.[subgrupo];
+                    const horarios2 = horariosMaterias[cod]?.[sel];
+                    
+                    if (tienenCruce(horarios1, horarios2)) {
+                        compatible = false;
+                        break;
+                    }
+                }
+                
+                if (compatible) {
+                    opciones.push(subgrupo);
+                }
+            }
+        }
+        
+        return opciones;
+    }
+
+    // Función para verificar si dos horarios tienen cruce
+    function tienenCruce(horarios1, horarios2) {
+        if (!horarios1 || !horarios2) return false;
+        
+        for (const dia in horarios1) {
+            if (horarios2[dia]) {
+                for (const hora of horarios1[dia]) {
+                    if (horarios2[dia].includes(hora)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    // Función para actualizar selección
+    window.actualizarSeleccion = function(codigo, valor) {
+        if (valor) {
+            estadoConstructor.selecciones[codigo] = valor;
+        } else {
+            delete estadoConstructor.selecciones[codigo];
+        }
+        actualizarOpcionesConstructor();
+    };
+
+    // Función para calcular estadísticas
+    function calcularEstadisticas() {
+        const seleccionadas = Object.keys(estadoConstructor.selecciones).length;
+        
+        // Calcular combinaciones totales posibles
+        let total = 1;
+        estadoConstructor.materias.forEach(codigo => {
+            if (!estadoConstructor.selecciones[codigo]) {
+                const opciones = calcularOpcionesPosibles(codigo);
+                total *= opciones.length;
+                if (total > 1000) total = 1001;
+            }
+        });
+        
+        return {
+            seleccionadas,
+            total: total > 1000 ? 1000 : total
+        };
+    }
+
+    // Función para completar automáticamente
+    window.completarAutomaticamente = function() {
+        const pendientes = estadoConstructor.materias.filter(m => !estadoConstructor.selecciones[m]);
+        
+        if (pendientes.length === 0) {
+            verHorarioActual();
+            return;
+        }
+        
+        function buscarCompletar(index) {
+            if (index >= pendientes.length) {
+                return true;
+            }
+            
+            const codigo = pendientes[index];
+            const opciones = calcularOpcionesPosibles(codigo);
+            
+            // Probar opciones en orden
+            for (const opcion of opciones) {
+                estadoConstructor.selecciones[codigo] = opcion;
+                if (buscarCompletar(index + 1)) {
+                    return true;
+                }
+                delete estadoConstructor.selecciones[codigo];
+            }
+            
+            return false;
+        }
+        
+        if (buscarCompletar(0)) {
+            actualizarOpcionesConstructor();
+            verHorarioActual();
+        } else {
+            alert("No se puede completar el horario automáticamente. Intente seleccionar algunas materias manualmente.");
+        }
+    };
+
+    // Función para reiniciar constructor
+    window.reiniciarConstructor = function() {
+        estadoConstructor.selecciones = {};
+        actualizarOpcionesConstructor();
+    };
+
+    // Función para ver horario actual
+    window.verHorarioActual = function() {
+        if (Object.keys(estadoConstructor.selecciones).length === 0) {
+            alert("Seleccione al menos un grupo para ver el horario.");
+            return;
+        }
+        
+        // Ir a pantalla de horario
+        mostrarPantallaHorario(estadoConstructor.materias);
+        
+        // Marcar selecciones
+        setTimeout(() => {
+            for (const [codigo, subgrupo] of Object.entries(estadoConstructor.selecciones)) {
+                const grupo = subgrupo[0];
+                const numero = subgrupo[1];
+                
+                const grupoCheckbox = document.getElementById(`grupo-${codigo}-${grupo}`);
+                if (grupoCheckbox) {
+                    grupoCheckbox.checked = true;
+                    const columna = grupoCheckbox.closest('.columna-materia');
+                    if (columna) {
+                        mostrarSubgrupos(columna, codigo, grupo, materias[codigo].subgrupos);
+                        
+                        setTimeout(() => {
+                            const subCheckbox = document.getElementById(`subgrupo-${codigo}-${grupo}-${numero}`);
+                            if (subCheckbox) subCheckbox.checked = true;
+                        }, 100);
+                    }
+                }
+            }
+        }, 500);
+    };
+    // ===== FUNCIÓN PARA VOLVER AL INICIO =====
+    window.volverAlInicioCompleto = function() {
+        document.querySelector('#contenedor-anos').style.display = 'flex';
+        document.querySelector('#continuar').style.display = 'inline-block';
+        document.querySelector('h2').style.display = 'block';
+        
         document.querySelector('#contenedor-materias').style.display = 'none';
         document.querySelector('#botones-horario').style.display = 'none';
         document.querySelector('#horario').style.display = 'none';
+        document.querySelector('#combinaciones-container').style.display = 'none';
         
-        // Limpiar: Desmarcar todos los checkboxes
         document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
             cb.checked = false;
         });
         
-        // Limpiar: Ocultar y limpiar todos los contenedores de subgrupos
         document.querySelectorAll('[id^="subgrupos-"]').forEach(container => {
             container.innerHTML = '';
             container.style.display = 'none';
         });
+        
+        const tablaHorario = document.getElementById('horario');
+        if (tablaHorario) tablaHorario.innerHTML = '';
+        
+        combinacionesEncontradas = [];
+        combinacionActual = 0;
+        
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
+    window.volverAlMenu = function() {
+        volverAlInicioCompleto();
     };
 })();
 </script>
-</body>
-</html>
