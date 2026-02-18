@@ -4302,7 +4302,7 @@ window.exportarAExcel = function() {
                         }
                         .header { 
                             background: linear-gradient(135deg, #0f172a, #1e293b);
-                            color: white; 
+                            color: black; 
                             padding: 20px; 
                             border-radius: 10px 10px 0 0;
                             margin-bottom: 0;
@@ -4407,7 +4407,7 @@ window.exportarAExcel = function() {
                 </head>
                 <body>
                     <div class="header">
-                        <h1>🏥 Facultad de Medicina - U.A.G.R.M.</h1>
+                        <h1>🏥 HORARIO MEDICINA GESTIÓN 2026.</h1>
                     </div>
                     
                     <div class="subheader">
@@ -4415,14 +4415,6 @@ window.exportarAExcel = function() {
                             <div class="info-item">
                                 <div class="info-label">📅 Fecha de generación</div>
                                 <div class="info-value">${fecha}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">📚 Materias inscritas</div>
-                                <div class="info-value">${materiasInfo.length}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">👨‍⚕️ Período académico</div>
-                                <div class="info-value">Primer Semestre 2026</div>
                             </div>
                         </div>
                         
@@ -4439,9 +4431,7 @@ window.exportarAExcel = function() {
                     ${tablaClone.outerHTML}
                     
                     <div class="footer">
-                        <p>Horario generado con la Plataforma de Horarios - Medicina U.A.G.R.M. (No oficial)</p>
                         <p>Desarrollado por Erik León - 2026 | Los horarios están sujetos a cambios según disposición de la facultad</p>
-                        <p style="font-size: 9px; margin-top: 10px;">* Los colores representan diferentes grupos y materias para mejor visualización</p>
                     </div>
                 </body>
             </html>
