@@ -3608,11 +3608,18 @@ const coloresGrupos = {
     };
 
     // Función auxiliar para mostrar subgrupos
-    window.mostrarSubgrupos = function(columnaMateria, codigo, grupo, subgruposTotales) {
-        const contenedorSub = columnaMateria.querySelector(`#subgrupos-${codigo}-${grupo}`);
-        if (!contenedorSub) return;
+window.mostrarSubgrupos = function(columnaMateria, codigo, grupo, subgruposTotales) {
+    // Buscar el contenedor de forma más específica
+    const contenedorSub = columnaMateria.querySelector(`#subgrupos-${codigo}-${grupo}`);
+    if (!contenedorSub) {
+        // Si no existe, intentar crearlo? Por ahora, solo salir.
+        // console.warn(`Contenedor de subgrupos no encontrado para ${codigo}-${grupo}`);
+        return;
+    }
 
-        contenedorSub.innerHTML = "";
+    // Limpiar solo si es necesario, o simplemente asegurarse de que esté visible
+    if (contenedorSub.style.display === 'none' || contenedorSub.innerHTML === '') {
+        contenedorSub.innerHTML = ""; // Limpiar antes de reconstruir
 
         for (let j = 1; j <= subgruposTotales; j++) {
             const subgrupo = `${grupo}${j}`;
@@ -3628,9 +3635,11 @@ const coloresGrupos = {
             
             contenedorSub.appendChild(label);
         }
-        
-        contenedorSub.style.display = "block";
-    };
+    }
+    
+    // Asegurarse de que se muestre
+    contenedorSub.style.display = "block";
+};
 
     // Función principal que construye la vista de horario
     function mostrarPantallaHorario(materiasSeleccionadasArray) {
@@ -4039,57 +4048,69 @@ const coloresGrupos = {
         contenedor.innerHTML = html;
         
         const stats = calcularEstadisticas();
-        document.getElementById('contador-opciones').textContent = stats.total > 1000 ? '1000+' : stats.total;
+document.getElementById('contador-opciones').textContent = stats.total >= 10000 ? '+9999' : stats.total;
         
         const progreso = (stats.seleccionadas / estadoConstructor.materias.length) * 100;
         document.getElementById('barra-progreso').style.width = `${progreso}%`;
     }
 
-    function calcularOpcionesPosibles(codigo) {
-        const materia = materias[codigo];
-        const opciones = [];
-        
-        for (let i = 0; i < materia.grupos; i++) {
-            const grupo = String.fromCharCode(65 + i);
-            for (let j = 1; j <= materia.subgrupos; j++) {
-                const subgrupo = `${grupo}${j}`;
+function calcularOpcionesPosibles(codigo) {
+    const materia = materias[codigo];
+    if (!materia) return [];
+    
+    const opciones = [];
+    
+    for (let i = 0; i < materia.grupos; i++) {
+        const grupo = String.fromCharCode(65 + i);
+        for (let j = 1; j <= materia.subgrupos; j++) {
+            const subgrupo = `${grupo}${j}`;
+            
+            let compatible = true;
+            // Verificar compatibilidad con las materias YA SELECCIONADAS
+            for (const [cod, sel] of Object.entries(estadoConstructor.selecciones)) {
+                if (cod === codigo) continue; // No compararse con sí misma
                 
-                let compatible = true;
-                for (const [cod, sel] of Object.entries(estadoConstructor.selecciones)) {
-                    if (cod === codigo) continue;
-                    
-                    const horarios1 = horariosMaterias[codigo]?.[subgrupo];
-                    const horarios2 = horariosMaterias[cod]?.[sel];
-                    
-                    if (tienenCruce(horarios1, horarios2)) {
-                        compatible = false;
-                        break;
-                    }
-                }
+                // Obtener horarios de la materia actual (candidata) y la ya seleccionada
+                const horariosCandidato = horariosMaterias[codigo]?.[subgrupo];
+                const horariosSeleccionado = horariosMaterias[cod]?.[sel];
                 
-                if (compatible) {
-                    opciones.push(subgrupo);
+                // Usar la función mejorada que ya maneja nulls/undefined
+                if (tienenCruce(horariosCandidato, horariosSeleccionado)) {
+                    compatible = false;
+                    break; // Sale del bucle de comparación
                 }
             }
+            
+            if (compatible) {
+                opciones.push(subgrupo);
+            }
         }
-        
-        return opciones;
     }
+    
+    return opciones;
+}
 
-    function tienenCruce(horarios1, horarios2) {
-        if (!horarios1 || !horarios2) return false;
-        
-        for (const dia in horarios1) {
-            if (horarios2[dia]) {
-                for (const hora of horarios1[dia]) {
-                    if (horarios2[dia].includes(hora)) {
-                        return true;
-                    }
-                }
-            }
-        }
+function tienenCruce(horarios1, horarios2) {
+    // Si alguno de los horarios es null, undefined o está vacío, asumimos que no hay cruce
+    // para no bloquear la selección. En un caso ideal, todos los horarios deberían existir.
+    if (!horarios1 || !horarios2 || Object.keys(horarios1).length === 0 || Object.keys(horarios2).length === 0) {
+        // Podrías poner un console.warn para depurar qué materias no tienen horarios
+        // console.warn('Horarios incompletos:', { horarios1, horarios2 });
         return false;
     }
+    
+    for (const dia in horarios1) {
+        // Verificar si el día existe en horarios2 y si es un array
+        if (horarios2[dia] && Array.isArray(horarios1[dia]) && Array.isArray(horarios2[dia])) {
+            for (const hora of horarios1[dia]) {
+                if (horarios2[dia].includes(hora)) {
+                    return true; // Cruce encontrado
+                }
+            }
+        }
+    }
+    return false; // No hay cruce
+}
 
     window.actualizarSeleccion = function(codigo, valor) {
         if (valor) {
@@ -4100,23 +4121,30 @@ const coloresGrupos = {
         actualizarOpcionesConstructor();
     };
 
-    function calcularEstadisticas() {
-        const seleccionadas = Object.keys(estadoConstructor.selecciones).length;
-        
-        let total = 1;
-        estadoConstructor.materias.forEach(codigo => {
-            if (!estadoConstructor.selecciones[codigo]) {
-                const opciones = calcularOpcionesPosibles(codigo);
-                total *= opciones.length;
-                if (total > 1000) total = 1001;
+function calcularEstadisticas() {
+    const seleccionadas = Object.keys(estadoConstructor.selecciones).length;
+    
+    // Calcular el número aproximado de combinaciones restantes
+    let totalCombinaciones = 1;
+    let combinacionesExcedidas = false;
+    
+    for (const codigo of estadoConstructor.materias) {
+        if (!estadoConstructor.selecciones[codigo]) {
+            const opciones = calcularOpcionesPosibles(codigo);
+            // Si ya pasamos de 10,000, no seguimos multiplicando para no congelar
+            if (totalCombinaciones * opciones.length > 10000) {
+                combinacionesExcedidas = true;
+                break;
             }
-        });
-        
-        return {
-            seleccionadas,
-            total: total > 1000 ? 1000 : total
-        };
+            totalCombinaciones *= opciones.length;
+        }
     }
+    
+    return {
+        seleccionadas,
+        total: combinacionesExcedidas ? 10000 : totalCombinaciones // Devolvemos un límite
+    };
+}
 
     window.completarAutomaticamente = function() {
         const pendientes = estadoConstructor.materias.filter(m => !estadoConstructor.selecciones[m]);
