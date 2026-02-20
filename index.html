@@ -302,6 +302,115 @@
         font-size: 11px;
     }
 }
+
+/* Estilos para el sistema de prioridades */
+.materia-prioridad {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.materia-prioridad:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.materia-prioridad.seleccionada {
+    border: 3px solid #3b82f6 !important;
+    background-color: #f0f9ff !important;
+}
+
+.materia-prioridad.seleccionada::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(59,130,246,0) 100%);
+    pointer-events: none;
+}
+
+.numero-prioridad {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 32px;
+    height: 32px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(59,130,246,0.3);
+    border: 2px solid white;
+    z-index: 10;
+    animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.boton-ordenar {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 8px;
+}
+
+.boton-ordenar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(124,58,237,0.3);
+}
+
+.boton-ordenar.activo {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.instrucciones-prioridad {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #e2e8f0;
+    font-size: 11px;
+    color: #475569;
+}
+
+.instrucciones-prioridad span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ejemplo-prioridad {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 24px;
+    font-weight: bold;
+    margin: 0 5px;
+}
     </style>
 </head>
 <body>
@@ -3561,7 +3670,7 @@ const coloresGrupos = {
     }
 };
 
-    // Función para mostrar materias de un año
+   // Función para mostrar materias de un año
     window.mostrarMaterias = function(ano) {
         const contenedorMaterias = document.getElementById(`materias-${ano}`);
         contenedorMaterias.innerHTML = "";
@@ -3609,17 +3718,11 @@ const coloresGrupos = {
 
     // Función auxiliar para mostrar subgrupos
 window.mostrarSubgrupos = function(columnaMateria, codigo, grupo, subgruposTotales) {
-    // Buscar el contenedor de forma más específica
     const contenedorSub = columnaMateria.querySelector(`#subgrupos-${codigo}-${grupo}`);
-    if (!contenedorSub) {
-        // Si no existe, intentar crearlo? Por ahora, solo salir.
-        // console.warn(`Contenedor de subgrupos no encontrado para ${codigo}-${grupo}`);
-        return;
-    }
+    if (!contenedorSub) return;
 
-    // Limpiar solo si es necesario, o simplemente asegurarse de que esté visible
     if (contenedorSub.style.display === 'none' || contenedorSub.innerHTML === '') {
-        contenedorSub.innerHTML = ""; // Limpiar antes de reconstruir
+        contenedorSub.innerHTML = "";
 
         for (let j = 1; j <= subgruposTotales; j++) {
             const subgrupo = `${grupo}${j}`;
@@ -3637,13 +3740,11 @@ window.mostrarSubgrupos = function(columnaMateria, codigo, grupo, subgruposTotal
         }
     }
     
-    // Asegurarse de que se muestre
     contenedorSub.style.display = "block";
 };
 
     // Función principal que construye la vista de horario
     function mostrarPantallaHorario(materiasSeleccionadasArray) {
-        // Ocultar selector y mostrar panel horario
         document.querySelector('#contenedor-anos').style.display = 'none';
         document.querySelector('#continuar').style.display = 'none';
         document.querySelector('h2').style.display = 'none';
@@ -3669,9 +3770,7 @@ window.mostrarSubgrupos = function(columnaMateria, codigo, grupo, subgruposTotal
             for (let i = 0; i < materia.grupos; i++) {
                 const grupo = String.fromCharCode(65 + i);
                 
-                // Buscar el docente para este grupo específico
                 let docenteGrupo = '';
-                // Probar con todas las variantes de subgrupo (A1, A2, A3, etc.)
                 for (let j = 1; j <= materia.subgrupos; j++) {
                     const subgrupo = `${grupo}${j}`;
                     const docenteCompleto = textosPersonalizados[codigo]?.[subgrupo];
@@ -3697,7 +3796,6 @@ window.mostrarSubgrupos = function(columnaMateria, codigo, grupo, subgruposTotal
                 
                 const labelGrupo = document.createElement("label");
                 labelGrupo.htmlFor = `grupo-${codigo}-${grupo}`;
-                // Mostrar el grupo normal y el docente en negrita
                 if (docenteGrupo) {
                     labelGrupo.innerHTML = ` Grupo ${grupo} <strong>${docenteGrupo}</strong>`;
                 } else {
@@ -3717,7 +3815,6 @@ window.mostrarSubgrupos = function(columnaMateria, codigo, grupo, subgruposTotal
             contenedorMaterias.appendChild(columnaMateria);
         });
 
-        // Evento para mostrar horario (el resto del código sigue igual)
         document.getElementById("mostrarHorario").onclick = function() {
             const tabla = document.getElementById("horario");
             tabla.innerHTML = "";
@@ -3816,178 +3913,92 @@ window.mostrarSubgrupos = function(columnaMateria, codigo, grupo, subgruposTotal
             }
         };
     }
-    // ===== RESTO DEL CÓDIGO (constructor, combinaciones, etc) =====
-    let combinacionesEncontradas = [];
-    let combinacionActual = 0;
 
-    // Función para calcular combinaciones óptimas sin cruces
-    window.calcularCombinacionesOptimas = function() {
-        const materiasSeleccionadas = [];
-        document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
-            materiasSeleccionadas.push(cb.value);
-        });
-        
-        if (materiasSeleccionadas.length === 0) {
-            alert("Por favor, seleccione al menos una materia.");
-            return;
-        }
-
-        alert(`Buscando horarios para ${materiasSeleccionadas.length} materias...`);
-
-        const opcionesPorMateria = {};
-        materiasSeleccionadas.forEach(codigo => {
-            const materia = materias[codigo];
-            if (!materia) return;
-            
-            opcionesPorMateria[codigo] = [];
-            for (let i = 0; i < materia.grupos; i++) {
-                const grupo = String.fromCharCode(65 + i);
-                for (let j = 1; j <= materia.subgrupos; j++) {
-                    opcionesPorMateria[codigo].push(`${grupo}${j}`);
-                }
-            }
-        });
-
-        const materiasOrdenadas = Object.keys(opcionesPorMateria).sort((a, b) => 
-            opcionesPorMateria[a].length - opcionesPorMateria[b].length
-        );
-
-        combinacionesEncontradas = [];
-        const LIMITE_COMBINACIONES = 50;
-        
-        function buscarCombinaciones(materiaIndex, combinacionActual, horariosOcupados) {
-            if (combinacionesEncontradas.length >= LIMITE_COMBINACIONES) {
-                return true;
-            }
-            
-            if (materiaIndex >= materiasOrdenadas.length) {
-                combinacionesEncontradas.push({...combinacionActual});
-                return false;
-            }
-            
-            const codigoMateria = materiasOrdenadas[materiaIndex];
-            const opciones = opcionesPorMateria[codigoMateria];
-            
-            for (const subgrupo of opciones) {
-                const horariosSubgrupo = horariosMaterias[codigoMateria]?.[subgrupo];
-                if (!horariosSubgrupo) continue;
-                
-                let tieneCruce = false;
-                const nuevosHorarios = {...horariosOcupados};
-                
-                for (const dia of Object.keys(horariosSubgrupo)) {
-                    for (const hora of horariosSubgrupo[dia]) {
-                        const clave = `${dia}-${hora}`;
-                        if (nuevosHorarios[clave]) {
-                            tieneCruce = true;
-                            break;
-                        }
-                        nuevosHorarios[clave] = true;
-                    }
-                    if (tieneCruce) break;
-                }
-                
-                if (!tieneCruce) {
-                    combinacionActual[codigoMateria] = subgrupo;
-                    const deberiaDetener = buscarCombinaciones(materiaIndex + 1, combinacionActual, nuevosHorarios);
-                    delete combinacionActual[codigoMateria];
-                    
-                    if (deberiaDetener) return true;
-                }
-            }
-            
-            return false;
-        }
-
-        buscarCombinaciones(0, {}, {});
-
-        if (combinacionesEncontradas.length === 0) {
-            alert("No se encontraron horarios sin cruces.");
-            return;
-        }
-
-        console.log("Combinaciones encontradas:", combinacionesEncontradas.length);
-    };
-
-    // ===== SISTEMA DE CONSTRUCTOR DE HORARIO =====
+    // ===== SISTEMA DE CONSTRUCTOR DE HORARIO CON PRIORIDADES =====
     let estadoConstructor = {
         materias: [],
         selecciones: {},
+        prioridades: {},
         modo: 'activo'
     };
 
-    window.iniciarConstructorHorario = function() {
-        const materiasSeleccionadas = [];
-        document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
-            materiasSeleccionadas.push(cb.value);
-        });
-        
-        if (materiasSeleccionadas.length === 0) {
-            alert("Por favor, seleccione al menos una materia.");
-            return;
-        }
+window.iniciarConstructorHorario = function() {
+    const materiasSeleccionadas = [];
+    document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+        materiasSeleccionadas.push(cb.value);
+    });
+    
+    if (materiasSeleccionadas.length === 0) {
+        alert("Por favor, seleccione al menos una materia.");
+        return;
+    }
 
-        document.querySelector('#contenedor-anos').style.display = 'none';
-        document.querySelector('#continuar').style.display = 'none';
-        document.querySelector('h2').style.display = 'none';
-        
-        const panelAnterior = document.getElementById('constructor-panel');
-        if (panelAnterior) panelAnterior.remove();
+    // Guardar las materias originales para poder restaurarlas después
+    const materiasOriginales = [...materiasSeleccionadas];
 
-        const panel = document.createElement('div');
-        panel.id = 'constructor-panel';
-        panel.innerHTML = `
-            <div style="background: white; padding: 25px; border-radius: 16px; margin: 20px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3 style="margin: 0; color: #0f172a; font-weight: 600;">🛠️ Constructor de Horario</h3>
-                    <button onclick="cerrarConstructor()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #64748b;">✕</button>
+    document.querySelector('#contenedor-anos').style.display = 'none';
+    document.querySelector('#continuar').style.display = 'none';
+    document.querySelector('h2').style.display = 'none';
+    
+    const panelAnterior = document.getElementById('constructor-panel');
+    if (panelAnterior) panelAnterior.remove();
+
+    const panel = document.createElement('div');
+    panel.id = 'constructor-panel';
+    panel.innerHTML = `
+        <div style="background: white; padding: 25px; border-radius: 16px; margin: 20px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #0f172a; font-weight: 600;">🛠️ Constructor de Horario</h3>
+                <button onclick="cerrarConstructor()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #64748b;">✕</button>
+            </div>
+            
+            <p style="color: #475569; margin-bottom: 20px;">Haga clic en cualquier tarjeta para asignarle prioridad. El orden de prioridad determina qué materia se intentará agendar primero.</p>
+            
+            <div id="opciones-dinamicas" style="margin-bottom: 20px;"></div>
+            
+            <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 500; color: #334155;">Horarios posibles:</span>
+                    <span id="contador-opciones" style="font-weight: 700; color: #2563eb; font-size: 18px;">Calculando...</span>
                 </div>
-                
-                <p style="color: #475569; margin-bottom: 20px;">Seleccione grupos para cada materia. El sistema le mostrará solo opciones compatibles:</p>
-                
-                <div id="opciones-dinamicas" style="margin-bottom: 20px;"></div>
-                
-                <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: 500; color: #334155;">Horarios posibles:</span>
-                        <span id="contador-opciones" style="font-weight: 700; color: #2563eb; font-size: 18px;">Calculando...</span>
-                    </div>
-                    <div style="margin-top: 10px; height: 4px; background: #e2e8f0; border-radius: 2px;">
-                        <div id="barra-progreso" style="height: 100%; background: #22c55e; border-radius: 2px; width: 0%;"></div>
-                    </div>
-                </div>
-                
-                <div style="display: flex; gap: 12px; justify-content: center;">
-                    <button onclick="completarAutomaticamente()" 
-                            style="background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 12px 24px; border: none; border-radius: 30px; font-weight: 500; cursor: pointer; flex: 1;">
-                        ⚡ Completar Automáticamente
-                    </button>
-                    <button onclick="reiniciarConstructor()" 
-                            style="background: #f1f5f9; color: #334155; padding: 12px 24px; border: 1px solid #cbd5e1; border-radius: 30px; font-weight: 500; cursor: pointer;">
-                        ↻ Reiniciar
-                    </button>
-                    <button onclick="verHorarioActual()" 
-                            style="background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 30px; font-weight: 500; cursor: pointer;">
-                        👁️ Ver Horario
-                    </button>
-                </div>
-                
-                <div style="margin-top: 15px; text-align: center; font-size: 11px; color: #94a3b8;">
-                    Las opciones se actualizan automáticamente según sus selecciones
+                <div style="margin-top: 10px; height: 4px; background: #e2e8f0; border-radius: 2px;">
+                    <div id="barra-progreso" style="height: 100%; background: #22c55e; border-radius: 2px; width: 0%;"></div>
                 </div>
             </div>
-        `;
-        
-        document.querySelector('#contenedor-anos').insertAdjacentElement('afterend', panel);
-        
-        estadoConstructor = {
-            materias: materiasSeleccionadas,
-            selecciones: {},
-            modo: 'activo'
-        };
-        
-        actualizarOpcionesConstructor();
+            
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button onclick="completarAutomaticamente()" 
+                        style="background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 12px 24px; border: none; border-radius: 30px; font-weight: 500; cursor: pointer; flex: 1;">
+                    ⚡ Completar Automáticamente
+                </button>
+                <button onclick="reiniciarConstructor()" 
+                        style="background: #f1f5f9; color: #334155; padding: 12px 24px; border: 1px solid #cbd5e1; border-radius: 30px; font-weight: 500; cursor: pointer;">
+                    ↻ Reiniciar
+                </button>
+                <button onclick="verHorarioActual()" 
+                        style="background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 30px; font-weight: 500; cursor: pointer;">
+                    👁️ Ver Horario
+                </button>
+            </div>
+            
+            <div style="margin-top: 15px; text-align: center; font-size: 11px; color: #94a3b8;">
+                Las opciones se actualizan automáticamente según sus selecciones
+            </div>
+        </div>
+    `;
+    
+    document.querySelector('#contenedor-anos').insertAdjacentElement('afterend', panel);
+    
+    estadoConstructor = {
+        materias: materiasSeleccionadas,
+        materiasOriginales: materiasOriginales, // Guardar para reiniciar
+        selecciones: {},
+        prioridades: {},
+        modo: 'activo'
     };
+    
+    actualizarOpcionesConstructor();
+};
 
     window.cerrarConstructor = function() {
         document.getElementById('constructor-panel')?.remove();
@@ -4001,39 +4012,66 @@ window.mostrarSubgrupos = function(columnaMateria, codigo, grupo, subgruposTotal
         const contenedor = document.getElementById('opciones-dinamicas');
         if (!contenedor) return;
         
-        let html = '<div style="display: flex; flex-wrap: wrap; gap: 20px;">';
+        // Usar las prioridades exactas que el usuario asignó
+        const prioridades = estadoConstructor.prioridades || {};
         
-        estadoConstructor.materias.forEach(codigo => {
+        let html = `
+            <div class="instrucciones-prioridad">
+                <span>
+                    <span class="ejemplo-prioridad">1</span> 
+                    Haga clic en cualquier tarjeta para asignarle prioridad. 
+                    El orden de prioridad determina qué materia se intentará agendar primero.
+                </span>
+                <button onclick="reiniciarPrioridades()" class="boton-ordenar">
+                    ↻ Reiniciar Prioridades
+                </button>
+            </div>
+            <div id="sortable-container" style="display: flex; flex-wrap: wrap; gap: 20px;">
+        `;
+        
+        estadoConstructor.materias.forEach((codigo, index) => {
             const materia = materias[codigo];
-            const seleccionActual = estadoConstructor.selecciones[codigo];
+            const tieneSeleccion = !!estadoConstructor.selecciones[codigo];
+            const prioridad = prioridades[codigo] || null;
             const opcionesPosibles = calcularOpcionesPosibles(codigo);
             
             html += `
-                <div style="flex: 1; min-width: 250px; background: white; border: 2px solid ${seleccionActual ? '#22c55e' : '#e2e8f0'}; padding: 15px; border-radius: 12px; transition: all 0.2s;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
-                        <strong style="color: #0f172a; font-size: 12px;">${materia.nombre}</strong>
-                        <span style="background: ${seleccionActual ? '#22c55e20' : '#f1f5f9'}; color: ${seleccionActual ? '#16a34a' : '#64748b'}; padding: 2px 8px; border-radius: 12px; font-size: 10px;">
-                            ${opcionesPosibles.length} opciones
+                <div class="materia-prioridad ${tieneSeleccion ? 'seleccionada' : ''}" 
+                     data-codigo="${codigo}" 
+                     onclick="seleccionarPrioridad('${codigo}')"
+                     style="flex: 1; min-width: 280px; background: white; border: 2px solid ${tieneSeleccion ? '#3b82f6' : '#e2e8f0'}; padding: 15px; border-radius: 12px; transition: all 0.2s; position: relative;">
+                    
+                    ${prioridad ? `<div class="numero-prioridad">${prioridad}</div>` : ''}
+                    
+                    <div style="display: flex; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0;">
+                        <span style="background: ${tieneSeleccion ? '#3b82f6' : '#f1f5f9'}; color: ${tieneSeleccion ? 'white' : '#64748b'}; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: bold; margin-right: 8px;">
+                            ${index + 1}
+                        </span>
+                        <strong style="color: #0f172a; font-size: 12px; flex: 1;">${materia ? materia.nombre : 'Materia no encontrada'}</strong>
+                        <span style="background: ${tieneSeleccion ? '#3b82f620' : '#f1f5f9'}; color: ${tieneSeleccion ? '#2563eb' : '#64748b'}; padding: 2px 8px; border-radius: 12px; font-size: 10px; margin-left: 5px;">
+                            ${opcionesPosibles.length} opc.
                         </span>
                     </div>
                     
                     <select onchange="actualizarSeleccion('${codigo}', this.value)" 
+                            onclick="event.stopPropagation()"
                             style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 8px; font-size: 11px;">
                         <option value="">Seleccione grupo...</option>
             `;
             
-            const opcionesOrdenadas = opcionesPosibles.sort();
+            const opcionesOrdenadas = [...opcionesPosibles].sort();
             opcionesOrdenadas.forEach(subgrupo => {
-                const selected = seleccionActual === subgrupo ? 'selected' : '';
-                html += `<option value="${subgrupo}" ${selected}>Grupo ${subgrupo}</option>`;
+                const selected = estadoConstructor.selecciones[codigo] === subgrupo ? 'selected' : '';
+                const docente = textosPersonalizados[codigo]?.[subgrupo] || 'Docente no asignado';
+                html += `<option value="${subgrupo}" ${selected}>${subgrupo} - ${docente}</option>`;
             });
             
             html += `</select>`;
             
-            if (seleccionActual) {
-                const docenteCompleto = textosPersonalizados[codigo]?.[seleccionActual] || '';
+            if (estadoConstructor.selecciones[codigo]) {
+                const docenteCompleto = textosPersonalizados[codigo]?.[estadoConstructor.selecciones[codigo]] || '';
                 const docenteResumido = obtenerNombreDocenteResumido(docenteCompleto);
-                const color = coloresGrupos[codigo]?.[seleccionActual] || '#f8fafc';
+                const color = coloresGrupos[codigo]?.[estadoConstructor.selecciones[codigo]] || '#f8fafc';
                 html += `
                     <div style="font-size: 10px; padding: 6px; background: ${color}; border-radius: 6px; margin-top: 5px;">
                         <span style="color: #1e293b;">📚 ${docenteResumido || 'Docente no asignado'}</span>
@@ -4048,69 +4086,174 @@ window.mostrarSubgrupos = function(columnaMateria, codigo, grupo, subgruposTotal
         contenedor.innerHTML = html;
         
         const stats = calcularEstadisticas();
-document.getElementById('contador-opciones').textContent = stats.total >= 10000 ? '+9999' : stats.total;
+        document.getElementById('contador-opciones').textContent = stats.total >= 10000 ? '+9999' : stats.total;
         
-        const progreso = (stats.seleccionadas / estadoConstructor.materias.length) * 100;
+        const progreso = (Object.keys(estadoConstructor.selecciones).length / estadoConstructor.materias.length) * 100;
         document.getElementById('barra-progreso').style.width = `${progreso}%`;
     }
 
-function calcularOpcionesPosibles(codigo) {
-    const materia = materias[codigo];
-    if (!materia) return [];
-    
-    const opciones = [];
-    
-    for (let i = 0; i < materia.grupos; i++) {
-        const grupo = String.fromCharCode(65 + i);
-        for (let j = 1; j <= materia.subgrupos; j++) {
-            const subgrupo = `${grupo}${j}`;
-            
-            let compatible = true;
-            // Verificar compatibilidad con las materias YA SELECCIONADAS
-            for (const [cod, sel] of Object.entries(estadoConstructor.selecciones)) {
-                if (cod === codigo) continue; // No compararse con sí misma
-                
-                // Obtener horarios de la materia actual (candidata) y la ya seleccionada
-                const horariosCandidato = horariosMaterias[codigo]?.[subgrupo];
-                const horariosSeleccionado = horariosMaterias[cod]?.[sel];
-                
-                // Usar la función mejorada que ya maneja nulls/undefined
-                if (tienenCruce(horariosCandidato, horariosSeleccionado)) {
-                    compatible = false;
-                    break; // Sale del bucle de comparación
-                }
-            }
-            
-            if (compatible) {
-                opciones.push(subgrupo);
-            }
-        }
+// Reemplaza TODO desde donde comienza "window.seleccionarPrioridad" 
+// hasta el final de "window.reiniciarPrioridades" con este código:
+
+window.seleccionarPrioridad = function(codigo) {
+    // Inicializar si no existe
+    if (!estadoConstructor.prioridades) {
+        estadoConstructor.prioridades = {};
     }
     
-    return opciones;
-}
+    // Verificar si la materia ya tiene un grupo seleccionado
+    if (estadoConstructor.selecciones[codigo]) {
+        alert('Primero deseleccione el grupo de esta materia para cambiar su prioridad.');
+        return;
+    }
+    
+    // Si la materia ya tiene prioridad, la quitamos
+    if (estadoConstructor.prioridades[codigo]) {
+        delete estadoConstructor.prioridades[codigo];
+        
+        // Reordenar las prioridades restantes para que sean consecutivas
+        const nuevasPrioridades = {};
+        let contador = 1;
+        
+        // Obtener todas las materias con prioridad (excluyendo la que acabamos de quitar)
+        // y mantener el orden original de las materias para asignar las prioridades
+        estadoConstructor.materias.forEach(mat => {
+            if (estadoConstructor.prioridades[mat]) {
+                nuevasPrioridades[mat] = contador++;
+            }
+        });
+        
+        estadoConstructor.prioridades = nuevasPrioridades;
+    } else {
+        // Si no tiene prioridad, se la asignamos con el siguiente número disponible
+        const siguientePrioridad = Object.keys(estadoConstructor.prioridades).length + 1;
+        estadoConstructor.prioridades[codigo] = siguientePrioridad;
+    }
+    
+    // IMPORTANTE: NO reordenamos las materias, mantenemos el orden original
+    // Solo actualizamos la vista para mostrar los nuevos números de prioridad
+    
+    actualizarOpcionesConstructor();
+};
 
-function tienenCruce(horarios1, horarios2) {
-    // Si alguno de los horarios es null, undefined o está vacío, asumimos que no hay cruce
-    // para no bloquear la selección. En un caso ideal, todos los horarios deberían existir.
-    if (!horarios1 || !horarios2 || Object.keys(horarios1).length === 0 || Object.keys(horarios2).length === 0) {
-        // Podrías poner un console.warn para depurar qué materias no tienen horarios
-        // console.warn('Horarios incompletos:', { horarios1, horarios2 });
+window.reiniciarPrioridades = function() {
+    estadoConstructor.prioridades = {};
+    
+    // Mantenemos el mismo orden de materias, solo limpiamos prioridades
+    actualizarOpcionesConstructor();
+};
+
+// También actualicemos la función completarAutomaticamente para que respete 
+// las prioridades pero NO reordene las tarjetas visualmente:
+
+window.completarAutomaticamente = function() {
+    // Usamos el orden original de las materias, pero ordenamos mentalmente por prioridad
+    // para el algoritmo de búsqueda, sin afectar la visualización
+    const materiasConPrioridad = [];
+    const materiasSinPrioridad = [];
+    
+    // Separar materias por si tienen prioridad o no
+    estadoConstructor.materias.forEach(codigo => {
+        if (estadoConstructor.prioridades[codigo]) {
+            materiasConPrioridad.push(codigo);
+        } else {
+            materiasSinPrioridad.push(codigo);
+        }
+    });
+    
+    // Ordenar las que tienen prioridad por su número
+    materiasConPrioridad.sort((a, b) => 
+        (estadoConstructor.prioridades[a] || 999) - (estadoConstructor.prioridades[b] || 999)
+    );
+    
+    // Combinar: primero las que tienen prioridad (en orden), luego las que no
+    const materiasOrdenadas = [...materiasConPrioridad, ...materiasSinPrioridad];
+    
+    // Función recursiva para buscar combinación (usando el orden por prioridad)
+    function buscarCompletar(index) {
+        if (index >= materiasOrdenadas.length) {
+            return true;
+        }
+        
+        const codigo = materiasOrdenadas[index];
+        
+        // Si ya tiene selección, pasar a la siguiente
+        if (estadoConstructor.selecciones[codigo]) {
+            return buscarCompletar(index + 1);
+        }
+        
+        // Calcular opciones posibles para esta materia
+        const opciones = calcularOpcionesPosibles(codigo);
+        
+        // Probar cada opción
+        for (const opcion of opciones) {
+            estadoConstructor.selecciones[codigo] = opcion;
+            if (buscarCompletar(index + 1)) {
+                return true;
+            }
+            delete estadoConstructor.selecciones[codigo];
+        }
+        
         return false;
     }
     
-    for (const dia in horarios1) {
-        // Verificar si el día existe en horarios2 y si es un array
-        if (horarios2[dia] && Array.isArray(horarios1[dia]) && Array.isArray(horarios2[dia])) {
-            for (const hora of horarios1[dia]) {
-                if (horarios2[dia].includes(hora)) {
-                    return true; // Cruce encontrado
+    // Intentar encontrar una combinación
+    if (buscarCompletar(0)) {
+        actualizarOpcionesConstructor();
+        verHorarioActual();
+    } else {
+        alert("No se puede completar el horario automáticamente. Intente seleccionar algunas materias manualmente o ajuste las prioridades.");
+    }
+};
+    function calcularOpcionesPosibles(codigo) {
+        const materia = materias[codigo];
+        if (!materia) return [];
+        
+        const opciones = [];
+        
+        for (let i = 0; i < materia.grupos; i++) {
+            const grupo = String.fromCharCode(65 + i);
+            for (let j = 1; j <= materia.subgrupos; j++) {
+                const subgrupo = `${grupo}${j}`;
+                
+                let compatible = true;
+                for (const [cod, sel] of Object.entries(estadoConstructor.selecciones)) {
+                    if (cod === codigo) continue;
+                    
+                    const horariosCandidato = horariosMaterias[codigo]?.[subgrupo];
+                    const horariosSeleccionado = horariosMaterias[cod]?.[sel];
+                    
+                    if (tienenCruce(horariosCandidato, horariosSeleccionado)) {
+                        compatible = false;
+                        break;
+                    }
+                }
+                
+                if (compatible) {
+                    opciones.push(subgrupo);
                 }
             }
         }
+        
+        return opciones;
     }
-    return false; // No hay cruce
-}
+
+    function tienenCruce(horarios1, horarios2) {
+        if (!horarios1 || !horarios2 || Object.keys(horarios1).length === 0 || Object.keys(horarios2).length === 0) {
+            return false;
+        }
+        
+        for (const dia in horarios1) {
+            if (horarios2[dia] && Array.isArray(horarios1[dia]) && Array.isArray(horarios2[dia])) {
+                for (const hora of horarios1[dia]) {
+                    if (horarios2[dia].includes(hora)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     window.actualizarSeleccion = function(codigo, valor) {
         if (valor) {
@@ -4121,45 +4264,47 @@ function tienenCruce(horarios1, horarios2) {
         actualizarOpcionesConstructor();
     };
 
-function calcularEstadisticas() {
-    const seleccionadas = Object.keys(estadoConstructor.selecciones).length;
-    
-    // Calcular el número aproximado de combinaciones restantes
-    let totalCombinaciones = 1;
-    let combinacionesExcedidas = false;
-    
-    for (const codigo of estadoConstructor.materias) {
-        if (!estadoConstructor.selecciones[codigo]) {
-            const opciones = calcularOpcionesPosibles(codigo);
-            // Si ya pasamos de 10,000, no seguimos multiplicando para no congelar
-            if (totalCombinaciones * opciones.length > 10000) {
-                combinacionesExcedidas = true;
-                break;
+    function calcularEstadisticas() {
+        const seleccionadas = Object.keys(estadoConstructor.selecciones).length;
+        
+        let totalCombinaciones = 1;
+        let combinacionesExcedidas = false;
+        
+        for (const codigo of estadoConstructor.materias) {
+            if (!estadoConstructor.selecciones[codigo]) {
+                const opciones = calcularOpcionesPosibles(codigo);
+                if (totalCombinaciones * opciones.length > 10000) {
+                    combinacionesExcedidas = true;
+                    break;
+                }
+                totalCombinaciones *= opciones.length;
             }
-            totalCombinaciones *= opciones.length;
         }
+        
+        return {
+            seleccionadas,
+            total: combinacionesExcedidas ? 10000 : totalCombinaciones
+        };
     }
-    
-    return {
-        seleccionadas,
-        total: combinacionesExcedidas ? 10000 : totalCombinaciones // Devolvemos un límite
-    };
-}
 
     window.completarAutomaticamente = function() {
-        const pendientes = estadoConstructor.materias.filter(m => !estadoConstructor.selecciones[m]);
-        
-        if (pendientes.length === 0) {
-            verHorarioActual();
-            return;
-        }
+        const materiasOrdenadas = [...estadoConstructor.materias].sort((a, b) => {
+            const prioridadA = estadoConstructor.prioridades?.[a] || 999;
+            const prioridadB = estadoConstructor.prioridades?.[b] || 999;
+            return prioridadA - prioridadB;
+        });
         
         function buscarCompletar(index) {
-            if (index >= pendientes.length) {
+            if (index >= materiasOrdenadas.length) {
                 return true;
             }
             
-            const codigo = pendientes[index];
+            const codigo = materiasOrdenadas[index];
+            
+            if (estadoConstructor.selecciones[codigo]) {
+                return buscarCompletar(index + 1);
+            }
+            
             const opciones = calcularOpcionesPosibles(codigo);
             
             for (const opcion of opciones) {
@@ -4183,6 +4328,7 @@ function calcularEstadisticas() {
 
     window.reiniciarConstructor = function() {
         estadoConstructor.selecciones = {};
+        estadoConstructor.prioridades = {};
         actualizarOpcionesConstructor();
     };
 
@@ -4238,9 +4384,6 @@ function calcularEstadisticas() {
         const tablaHorario = document.getElementById('horario');
         if (tablaHorario) tablaHorario.innerHTML = '';
         
-        combinacionesEncontradas = [];
-        combinacionActual = 0;
-        
         window.scrollTo({
             top: 0,
             behavior: 'smooth'
@@ -4252,7 +4395,7 @@ function calcularEstadisticas() {
     };
 })();
 
-// ===== FUNCIÓN MEJORADA PARA EXPORTAR A EXCEL CON MEJOR FORMATO =====
+// ===== FUNCIÓN PARA EXPORTAR A EXCEL =====
 window.exportarAExcel = function() {
     const tabla = document.getElementById('horario');
     
@@ -4262,15 +4405,12 @@ window.exportarAExcel = function() {
     }
     
     try {
-        // Clonar la tabla para no modificar la original
         const tablaClone = tabla.cloneNode(true);
         
-        // Preservar los colores de fondo y estilos
         const filas = tablaClone.querySelectorAll('tr');
         filas.forEach(fila => {
             const celdas = fila.querySelectorAll('td');
             celdas.forEach(celda => {
-                // Buscar la celda original para copiar estilos
                 const originalCelda = Array.from(document.querySelectorAll('#horario td')).find(
                     td => td.textContent === celda.textContent && 
                           td.parentElement.rowIndex === fila.rowIndex
@@ -4282,7 +4422,6 @@ window.exportarAExcel = function() {
                         celda.style.backgroundColor = bgColor;
                     }
                     
-                    // Copiar color de texto si es especial (como los cruces en rojo)
                     const color = window.getComputedStyle(originalCelda).color;
                     if (color && color !== 'rgb(0, 0, 0)') {
                         celda.style.color = color;
@@ -4291,7 +4430,6 @@ window.exportarAExcel = function() {
             });
         });
         
-        // Obtener información de las materias seleccionadas
         const materiasInfo = [];
         document.querySelectorAll('#contenedor-materias .columna-materia').forEach(columna => {
             const nombreMateria = columna.querySelector('h2')?.textContent || '';
@@ -4308,7 +4446,6 @@ window.exportarAExcel = function() {
             }
         });
         
-        // Crear contenido con mejor formato
         const fecha = new Date().toLocaleString('es-ES', {
             day: '2-digit',
             month: '2-digit',
@@ -4435,7 +4572,7 @@ window.exportarAExcel = function() {
                 </head>
                 <body>
                     <div class="header">
-                        <h1>🏥 HORARIO MEDICINA GESTIÓN 2026.</h1>
+                        <h1>🏥 HORARIO MEDICINA GESTIÓN 2026</h1>
                     </div>
                     
                     <div class="subheader">
@@ -4465,7 +4602,6 @@ window.exportarAExcel = function() {
             </html>
         `;
         
-        // Descargar archivo con nombre más descriptivo
         const fechaArchivo = new Date().toISOString().split('T')[0];
         const horaArchivo = new Date().toLocaleTimeString('es-ES').replace(/:/g, '-');
         const nombreArchivo = `Horario_Medicina_${fechaArchivo}_${horaArchivo}.xls`;
@@ -4479,19 +4615,6 @@ window.exportarAExcel = function() {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-        
-        // Feedback visual mejorado
-        const btn = event?.target;
-        if (btn) {
-            const textoOriginal = btn.innerHTML;
-            btn.innerHTML = '✅ ¡Exportado con éxito!';
-            btn.style.background = 'linear-gradient(135deg, #059669, #047857)';
-            btn.style.transform = 'scale(0.98)';
-            setTimeout(() => {
-                btn.innerHTML = textoOriginal;
-                btn.style.transform = 'scale(1)';
-            }, 2000);
-        }
         
     } catch (error) {
         console.error('Error detallado:', error);
