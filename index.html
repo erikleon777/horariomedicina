@@ -1,0 +1,4103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma para armar Horario de Medicina - U.A.G.R.M.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 12px;
+            background-color: #f8f9fc;
+            margin: 0;
+            padding: 20px;
+            color: #1e293b;
+        }
+        h2 {
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+        #contenedor-anos {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        #contenedor-materias {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin-top: 10px;
+            gap: 8px;
+        }
+        .columna-ano, .columna-materia {
+            flex: 1 1 0;
+            min-width: 200px;
+            border: 1px solid #e2e8f0;
+            padding: 2px;
+            border-radius: 10px;
+            text-align: center;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            transition: all 0.2s ease;
+        }
+        .columna-ano:hover, .columna-materia:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            border-color: #cbd5e1;
+        }
+        .columna-materia div {
+            margin: 8px 0;
+            padding: 0 4px;
+        }
+        .columna-materia label {
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            font-size: 11px;
+            display: inline-block;
+            max-width: calc(100% - 25px);
+            vertical-align: middle;
+        }
+        [id^="subgrupos-"] {
+            margin: 5px 0 5px 15px !important;
+            padding: 4px !important;
+            background: #f8fafc;
+            border-radius: 6px;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        [id^="subgrupos-"] label {
+            display: inline-block;
+            margin: 3px !important;
+            padding: 3px 8px !important;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+        .columna-ano h2, .columna-materia h2 {
+            margin: 1px;
+            padding: 8px 5px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            color: #0f172a;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            line-height: 1.2;
+            height: auto;
+            min-height: 15px;
+        }
+        .materias-ano, .grupos-subgrupos {
+            margin-top: 1px;
+            padding: 0px;
+        }
+        .materia {
+            padding: 4px 6px;
+            margin: 4px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            background-color: #ffffff;
+            transition: background-color 0.2s, border-color 0.2s;
+            font-size: 11px;
+            display: flex;
+            align-items: flex-start;
+            gap: 4px;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            word-break: break-word;
+        }
+        .materia:hover {
+            background-color: #f1f5f9;
+            border-color: #94a3b8;
+        }
+        .materia input[type="checkbox"] {
+            margin-right: 2px;
+            accent-color: #2563eb;
+            transform: scale(1);
+            flex-shrink: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 11px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 8px 4px;
+            text-align: center;
+            vertical-align: top;
+        }
+        th {
+            background: #f8fafc;
+            font-weight: 500;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            font-size: 10px;
+        }
+        td {
+            background-color: #ffffff;
+        }
+        button {
+            padding: 10px 22px;
+            font-size: 13px;
+            font-weight: 500;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s;
+            margin: 5px;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.01em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        #continuar {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+        #continuar:hover {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            transform: scale(1.02);
+            box-shadow: 0 6px 14px rgba(34, 197, 94, 0.25);
+        }
+        #mostrarHorario {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+        #mostrarHorario:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: scale(1.02);
+            box-shadow: 0 6px 14px rgba(59, 130, 246, 0.25);
+        }
+        #btnRegresar {
+            background: #ffffff;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        #btnRegresar:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+        button:active {
+            transform: scale(0.96);
+        }
+        h4 {
+            font-weight: 400;
+            color: #64748b;
+            margin-top: 25px;
+            text-align: center;
+            font-size: 11px;
+            letter-spacing: 0.02em;
+        }
+        label {
+            cursor: pointer;
+            display: inline-block;
+            margin: 2px 0;
+            font-size: 11px;
+        }
+        [id^="subgrupos-"] label {
+            margin-left: 4px;
+            background: #f8fafc;
+            padding: 2px 6px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            font-size: 10px;
+        }
+        @media (max-width: 900px) {
+            #contenedor-anos {
+                justify-content: flex-start;
+                padding-bottom: 8px;
+            }
+        }
+        @media (max-width: 768px) {
+            #contenedor-anos {
+                flex-wrap: wrap;
+            }
+            .columna-ano {
+                min-width: 150px;
+            }
+            .materia {
+                font-size: 10px;
+                padding: 3px 4px;
+            }
+            #contenedor-materias {
+                flex-direction: column;
+            }
+            .columna-materia {
+                min-width: 100%;
+                margin-bottom: 10px;
+            }
+            .columna-materia h2 {
+                font-size: 14px;
+                min-height: auto;
+                padding: 12px 8px;
+            }
+            [id^="subgrupos-"] label {
+                white-space: nowrap;
+                font-size: 11px;
+            }
+        }
+        .materia-prioridad {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .materia-prioridad:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .materia-prioridad.seleccionada {
+            border: 3px solid #3b82f6 !important;
+            background-color: #f0f9ff !important;
+        }
+        .materia-prioridad.seleccionada::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(59,130,246,0) 100%);
+            pointer-events: none;
+        }
+        .numero-prioridad {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 32px;
+            height: 32px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(59,130,246,0.3);
+            border: 2px solid white;
+            z-index: 10;
+            animation: popIn 0.3s ease;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .boton-ordenar {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 8px;
+        }
+        .boton-ordenar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(124,58,237,0.3);
+        }
+        .boton-ordenar.activo {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .instrucciones-prioridad {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #e2e8f0;
+            font-size: 11px;
+            color: #475569;
+        }
+        .instrucciones-prioridad span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .ejemplo-prioridad {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Seleccione las materias (Se pueden seleccionar materias de cualquier año)</h2>
+<div id="contenedor-anos">
+    <div class="columna-ano" id="ano1">
+        <h2 onclick="mostrarMaterias('ano1')">1º AÑO</h2>
+        <div class="materias-ano" id="materias-ano1"></div>
+    </div>
+    <div class="columna-ano" id="ano2">
+        <h2 onclick="mostrarMaterias('ano2')">2º AÑO</h2>
+        <div class="materias-ano" id="materias-ano2"></div>
+    </div>
+    <div class="columna-ano" id="ano3">
+        <h2 onclick="mostrarMaterias('ano3')">3º AÑO</h2>
+        <div class="materias-ano" id="materias-ano3"></div>
+    </div>
+    <div class="columna-ano" id="ano4">
+        <h2 onclick="mostrarMaterias('ano4')">4º AÑO</h2>
+        <div class="materias-ano" id="materias-ano4"></div>
+    </div>
+    <div class="columna-ano" id="ano5">
+        <h2 onclick="mostrarMaterias('ano5')">5º AÑO</h2>
+        <div class="materias-ano" id="materias-ano5"></div>
+    </div>
+</div>
+<br>
+<div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+    <button id="continuar" onclick="redirigirAHorario()">Continuar</button>
+    <button id="constructorBtn" onclick="iniciarConstructorHorario()" style="background: linear-gradient(135deg, #a855f7, #9333ea); color: white;">🛠️ Constructor de Horario</button>
+    <button id="btnInicio" onclick="volverAlInicioCompleto()" style="background: linear-gradient(135deg, #64748b, #475569); color: white;">🏠 Volver al Inicio</button>
+</div>
+
+<div id="contenedor-materias" style="display: none;"></div>
+
+<div id="botones-horario" style="display: none; gap: 10px; justify-content: center; margin: 10px 0;">
+    <button id="mostrarHorario">Mostrar Horario</button>
+    <div style="display: flex; gap: 8px;">
+        <button id="btnRegresar" onclick="volverAlMenu()" style="background: #64748b; color: white;">← Regresar</button>
+        <button id="btnExportarExcel" onclick="exportarAExcel()" style="background: linear-gradient(135deg, #059669, #047857); color: white;">📊 Exportar a Excel</button>
+    </div>
+    <button id="btnInicioDesdeHorario" onclick="volverAlInicioCompleto()" style="background: #64748b; color: white;">🏠 Volver al Inicio</button>
+</div>
+
+<table id="horario" style="display: none;"></table>
+
+<h4>2026 - Elaborado por Erik León - Página NO OFICIAL</h4>
+
+<script>
+(function() {
+    // ==================== MATERIAS POR AÑO ====================
+    const materiasPorAno = {
+        "ano1": [
+            { codigo: "MED100", nombre: "MED 100 - ANATOMÍA HUMANA" },
+            { codigo: "MED101", nombre: "MED 101 - HISTOLOGÍA Y EMBRIOLOGÍA" },
+            { codigo: "SAP100", nombre: "SAP 100 - SALUD PÚBLICA I" },
+            { codigo: "MAF100", nombre: "MAF 100 - FORMACIÓN SOCIOCULTURAL" }
+        ],
+        "ano2": [
+            { codigo: "MED200", nombre: "MED 200 - ANATOMÍA PATOLÓGICA" },
+            { codigo: "MED201", nombre: "MED 201 - BACTERIOLOGÍA Y VIROLOGÍA MÉDICA" },
+            { codigo: "MED202", nombre: "MED 202 - FISIOLOGÍA HUMANA" },
+            { codigo: "MED203", nombre: "MED 203 - BIOQUÍMICA MÉDICA" },
+            { codigo: "MED209", nombre: "MED 209 - PARASITOLOGÍA Y MICOLOGÍA MÉDICA" },
+            { codigo: "SAP200", nombre: "SAP 200 - SALUD PÚBLICA II" }
+        ],
+        "ano3": [
+            { codigo: "CIR305", nombre: "CIR 305 - CIRUGÍA I" },
+            { codigo: "MED301", nombre: "MED 301 - FISIOPATOLOGÍA" },
+            { codigo: "MED302", nombre: "MED 302 - SEMIOLOGÍA GENERAL" },
+            { codigo: "MED303", nombre: "MED 303 - FARMACOLOGÍA Y TERAPÉUTICA MÉDICA" },
+            { codigo: "MED304", nombre: "MED 304 - INFECTOLOGÍA Y MEDICINA TRADICIONAL" },
+            { codigo: "SAP300", nombre: "SAP 300 - SALUD PÚBLICA III" }
+        ],
+        "ano4": [
+            { codigo: "CIR400", nombre: "CIR 400 - CIRUGÍA II" },
+            { codigo: "CIR401", nombre: "CIR 401 - TRAUMATOLOGÍA" },
+            { codigo: "CIR402", nombre: "CIR 402 - OFTALMOLOGÍA" },
+            { codigo: "CIR403", nombre: "CIR 403 - ANESTESIOLOGÍA" },
+            { codigo: "MED400", nombre: "MED 400 - MEDICINA INTERNA I" },
+            { codigo: "MED405", nombre: "MED 405 - NEUROLOGÍA" },
+            { codigo: "MED413", nombre: "MED 413 - DERMATOLOGÍA" },
+            { codigo: "MED415", nombre: "MED 415 - PSICOPATOLOGÍA" },
+            { codigo: "SAP400", nombre: "SAP 400 - SALUD PÚBLICA IV" }
+        ],
+        "ano5": [
+            { codigo: "MED500", nombre: "MED 500 - MEDICINA INTERNA II" },
+            { codigo: "MED501", nombre: "MED 501 - PSIQUIATRÍA Y SALUD MENTAL" },
+            { codigo: "MED504", nombre: "MED 504 - PEDIATRÍA" },
+            { codigo: "CIR500", nombre: "CIR 500 - CIRUGÍA III" },
+            { codigo: "CIR505", nombre: "CIR 505 - GINECOLOGIA Y OBSTETRICIA" },
+            { codigo: "CIR506", nombre: "CIR 506 - OTORRINOLARINGOLOGÍA" },
+            { codigo: "MED508", nombre: "MED 508 - MEDICINA LEGAL Y ETICA MEDICA" }
+        ]
+    };
+
+    // ==================== ESTRUCTURA FLEXIBLE DE GRUPOS Y SUBGRUPOS ====================
+    // EJEMPLOS DE NOMBRES PERSONALIZADOS:
+    // - Para grupos con 1 subgrupo: puede ser "A", "B", "AM", "PM", "VIRTUAL", "PRESENCIAL", etc.
+    // - Para grupos con múltiples subgrupos: se recomienda usar letras simples (A, B, C, D, E, F, G, H)
+    const materias = {
+        // PRIMER AÑO
+        "MED100": { nombre: "MED 100 - ANATOMÍA HUMANA", grupos: { "A": 3, "B": 3, "C": 3, "D": 3, "E": 3, "F": 3, "G": 3, "H": 3 } },
+        "MED101": { nombre: "MED 101 - HISTOLOGÍA Y EMBRIOLOGÍA", grupos: { "A": 3, "B": 3, "C": 3, "D": 3, "E": 3, "F": 3, "G": 3, "H": 3 } },
+        "SAP100": { nombre: "SAP 100 - SALUD PÚBLICA I", grupos: { "A": 1, "B": 1, "C": 1, "D": 1, "E": 1, "F": 1, "G": 1, "H": 1 } },
+        "MAF100": { nombre: "MAF 100 - FORMACIÓN SOCIOCULTURAL", grupos: { "A": 1, "B": 1, "C": 1, "D": 1, "E": 1, "F": 1, "G": 1, "H": 1 } },
+        
+        // SEGUNDO AÑO
+        "MED200": { nombre: "MED 200 - ANATOMÍA PATOLÓGICA", grupos: { "A": 3, "B": 3, "C": 3, "D": 3, "E": 3, "F": 3 } },
+        "MED201": { nombre: "MED 201 - BACTERIOLOGÍA Y VIROLOGÍA MÉDICA", grupos: { "A": 3, "B": 3, "C": 3, "D": 3, "E": 3, "F": 3 } },
+        "MED202": { nombre: "MED 202 - FISIOLOGÍA HUMANA", grupos: { "A": 3, "B": 3, "C": 3, "D": 3, "E": 3, "F": 3 } },
+        "MED203": { nombre: "MED 203 - BIOQUÍMICA MÉDICA", grupos: { "A": 3, "B": 3, "C": 3, "D": 3, "E": 3, "F": 3 } },
+        "MED209": { nombre: "MED 209 - PARASITOLOGÍA Y MICOLOGÍA MÉDICA", grupos: { "A": 3, "B": 3, "C": 3, "D": 3, "E": 3, "F": 3 } },
+        "SAP200": { nombre: "SAP 200 - SALUD PÚBLICA II", grupos: { "A": 1, "B": 1, "C": 1, "D": 1, "E": 1, "F": 1 } },
+        
+        // TERCER AÑO
+        "CIR305": { nombre: "CIR 305 - CIRUGÍA I", grupos: { "A": 5, "B": 5, "C": 5, "D": 5, "E": 5 } },
+        "MED301": { nombre: "MED 301 - FISIOPATOLOGÍA", grupos: { "A": 1, "B": 1, "C": 1, "D": 1, "E": 1 } },
+        "MED302": { nombre: "MED 302 - SEMIOLOGÍA GENERAL", grupos: { "A": 5, "B": 5, "C": 5, "D": 5, "E": 5 } },
+        "MED303": { nombre: "MED 303 - FARMACOLOGÍA Y TERAPÉUTICA MÉDICA", grupos: { "A": 4, "B": 3, "C": 3, "D": 3, "E": 3, "F": 3, "G": 3 } },
+        "MED304": { nombre: "MED 304 - INFECTOLOGÍA Y MEDICINA TRADICIONAL", grupos: { "A": 5, "B": 5, "C": 5, "D": 5, "E": 5 } },
+        "SAP300": { nombre: "SAP 300 - SALUD PÚBLICA III", grupos: { "A": 1, "B": 1, "C": 1, "D": 1 } },
+        
+        // CUARTO AÑO
+        "CIR400": { nombre: "CIR 400 - CIRUGÍA II", grupos: { "A": 3, "B": 3, "C": 3, "D": 3, "E": 3 } },
+        "CIR401": { nombre: "CIR 401 - TRAUMATOLOGÍA", grupos: { "A": 5, "B": 5, "C": 5, "D": 5 } },
+        "CIR402": { nombre: "CIR 402 - OFTALMOLOGÍA", grupos: { "A": 5, "B": 5, "C": 5, "D": 5 } },
+        "CIR403": { nombre: "CIR 403 - ANESTESIOLOGÍA", grupos: { "A": 5, "B": 5, "C": 5, "D": 5 } },
+        "MED400": { nombre: "MED 400 - MEDICINA INTERNA I", grupos: { "A": 5, "B": 5, "C": 5, "D": 5, "E": 5 } },
+        "MED405": { nombre: "MED 405 - NEUROLOGÍA", grupos: { "A": 5, "B": 5, "C": 5, "D": 5 } },
+        "MED413": { nombre: "MED 413 - DERMATOLOGÍA", grupos: { "A": 5, "B": 5, "C": 5, "D": 5 } },
+        "MED415": { nombre: "MED 415 - PSICOPATOLOGÍA", grupos: { "A": 5, "B": 5, "C": 5, "D": 5 } },
+        "SAP400": { nombre: "SAP 400 - SALUD PÚBLICA IV", grupos: { "A": 1, "B": 1, "C": 1 } },
+        
+        // QUINTO AÑO
+        "MED500": { nombre: "MED 500 - MEDICINA INTERNA II", grupos: { "A": 5, "B": 5, "C": 5, "D": 5, "E": 5 } },
+        "MED501": { nombre: "MED 501 - PSIQUIATRÍA Y SALUD MENTAL", grupos: { "A": 5, "B": 5, "C": 5, "D": 5 } },
+        "MED504": { nombre: "MED 504 - PEDIATRÍA", grupos: { "A": 5, "B": 5, "C": 5, "D": 5 } },
+        "CIR500": { nombre: "CIR 500 - CIRUGÍA III", grupos: { "A": 4, "B": 4, "C": 4, "D": 4 } },
+        "CIR505": { nombre: "CIR 505 - GINECOLOGIA Y OBSTETRICIA", grupos: { "A": 5, "B": 5, "C": 5, "D": 5 } },
+        "CIR506": { nombre: "CIR 506 - OTORRINOLARINGOLOGÍA", grupos: { "A": 5, "B": 5, "C": 5, "D": 5 } },
+        "MED508": { nombre: "MED 508 - MEDICINA LEGAL Y ETICA MEDICA", grupos: { "A": 1, "B": 1, "C": 1, "D": 1 } }
+    };
+
+    // ==================== DATOS DE HORARIOS ====================
+    // IMPORTANTE: Para grupos con 1 subgrupo, usar: "A1", "B1", "AM1", "VIRTUAL1", etc.
+    // Para grupos con múltiples subgrupos, usar: "A1", "A2", "A3", "B1", "B2", etc.
+    const horariosMaterias = {
+        // ***** PRIMER AÑO *****
+  "MED100": {
+    "A1": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "A2": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "A3": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "B1": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"]
+    },
+    "B2": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"]
+    },
+    "B3": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "C1": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C2": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "C3": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "D1": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30"],
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "D2": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "D3": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30"],
+    },
+    "E1": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "E2": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Jueves": ["12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "E3": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "F1": {
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "F2": {
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "F3": {
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30", "16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "G1": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "G2": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "G3": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15"]
+    },
+    "H1": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "H2": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "H3": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    }
+  },
+  "MED101": {
+    "A1": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "A2": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "A3": {
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "B1": {
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "B2": {
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "B3": {
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "C1": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15", "16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "C2": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15", "18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "C3": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "D1": {
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "D2": {
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "D3": {
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "E1": {
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"]
+    },
+    "E2": {
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15"]
+    },    
+    "E3": {
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15"]
+    },
+    "F1": {
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Viernes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "F2": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30", "13:45 - 14:30", "14:30 - 15:15"],
+      "Viernes": ["16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "F3": {
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15", "16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "G1": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "G2": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "G3": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "H1": {
+      "Miércoles": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Viernes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "H2": {
+      "Miércoles": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Viernes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "H3": {
+      "Miércoles": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Viernes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"],
+    }
+  },
+  "SAP100": {
+    "A1": {
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "B1": {
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "C1": {
+      "Viernes": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "D1": {
+      "Viernes": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "E1": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "F1": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "G1": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "H1": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    }
+  },
+  "MAF100": {
+    "A1": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Jueves": ["21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "B1": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Jueves": ["21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "C1": {
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "D1": {
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "E1": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "F1": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "G1": {
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "H1": {
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    }
+  },
+        // ***** SEGUNDO AÑO *****
+  "MED200": {
+    "A1": {
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "A2": {
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "A3": {
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "B1": {
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "B2": {
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "B3": {
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "C1": {
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "C2": {
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "C3": {
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Viernes": ["18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "D1": {
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00", "13:45 - 14:30", "14:30 - 15:15"]
+    },
+    "D2": {
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "D3": {
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "E1": {
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "E2": {
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "E3": {
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "F1": {
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "F2": {
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "F3": {
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30"],
+    }
+  },
+  "MED201": {
+    "A1": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "A2": {
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "A3": {
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B1": {
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "B2": {
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "B3": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "C1": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "C2": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "C3": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D1": {
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D2": {
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "D3": {
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "E1": {
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "E2": {
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "E3": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "F1": {
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "F2": {
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "F3": {
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15", "18:15 - 19:00", "19:00 - 19:45"],
+    }
+  },
+  "MED202": {
+    "A1": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45", "08:30 - 09:15", "09:15 - 10:00"],
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "A2": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45", "10:00 - 10:45", "10:45 - 11:30"],
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "A3": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45", "11:30 - 12:15", "12:15 - 13:00"],
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "B1": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B2": {
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B3": {
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C1": {
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00", "13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "C2": {
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "C3": {
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D1": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30", "15:15 - 16:00", "16:00 - 16:45"],
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D2": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30", "13:45 - 14:30", "14:30 - 15:15"],
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D3": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "E1": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15", "18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "E2": {
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "E3": {
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "F1": {
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "F2": {
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "F3": {
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30", "15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+    }
+  },
+  "MED203": {
+    "A1": {
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "A2": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "A3": {
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B1": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "B2": {
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "B3": {
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "C1": {
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "C2": {
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "C3": {
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30", "10:00 - 10:45", "10:45 - 11:30"]
+    },
+    "D1": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "D2": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "D3": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "E1": {
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Viernes": ["10:45 - 11:30", "11:30 - 12:15"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "E2": {
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "E3": {
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Viernes": ["12:15 - 13:00", "13:00 - 13:45"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "F1": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Sábado": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "F2": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "F3": {
+     "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+     "Sábado": ["11:30 - 12:15", "12:15 - 13:00"],
+    }
+  },
+  "MED209": {
+    "A1": {
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "A2": {
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "A3": {
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "B1": {
+       "Lunes": ["08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B2": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "B3": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "C1": {
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "C2": {
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "C3": {
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D1": {
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "D2": {
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "D3": {
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "E1": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "E2": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "E3": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "F1": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Sábado": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "F2": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "F3": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Sábado": ["11:30 - 12:15", "12:15 - 13:00"],
+    }
+  },
+  "SAP200": {
+    "A1": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B1": {
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "C1": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D1": {
+      "Jueves": ["17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30"],
+    },
+    "E1": {
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "F1": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+    }
+  },
+        // ***** TERCER AÑO *****
+  "MED301": {
+    "A1": {
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"]
+    },
+    "B1": {
+      "Lunes": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Jueves": ["21:15 - 22:00", "22:00 - 22:45"]
+    },
+    "C1": {
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15"]
+    },
+    "D1": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"]
+    },
+    "E1": {
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"]
+    }
+  },
+  "MED302": {
+    "A1": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30"]
+    },
+    "A2": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30"],
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"]
+    },
+    "A3": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Sábado": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"]
+    },
+    "A4": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30"]
+    },
+    "A5": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30"]
+    },
+    "B1": {
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B2": {
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B3": {
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"],
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B4": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30", "15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "B5": {
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30", "15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"],
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30"],
+    },
+    "C1": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "C2": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "C3": {
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "C4": {
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "C5": {
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"],
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "D1": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "D2": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "D3": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "D4": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"]
+    },
+    "D5": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"]
+    },
+    "E1": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "E2": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30"],
+    },
+    "E3": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "E4": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"]
+    },
+    "E5": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+    }
+  },
+  "MED303": {
+    "A1": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "A2": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "A3": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "10:00 - 10:45", "10:45 - 11:30"],
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "A4": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "B1": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30"]
+    },
+    "B2": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30"]
+    },
+    "B3": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "C1": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "C2": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "C3": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "D1": {
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00", "18:15 - 19:00", "19:00 - 19:45"],
+      "Sábado": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D2": {
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00", "18:15 - 19:00", "19:00 - 19:45"],
+      "Sábado": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D3": {
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30", "18:15 - 19:00", "19:00 - 19:45"],
+      "Sábado": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "E1": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "E2": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "E3": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "F1": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "F2": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "F3": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "G1": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "G2": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "G3": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+    }
+  },
+  "MED304": {
+    "A1": {
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"]
+    },
+    "A2": {
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"]
+    },
+    "A3": {
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"]
+    },
+    "A4": {
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"]
+    },
+    "A5": {
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00", "19:45 - 20:30", "20:30 - 21:15"]
+    },
+    "B1": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "B2": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "B3": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "B4": {
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30", "10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B5": {
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "C1": {
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C2": {
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00","10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "C3": {
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C4": {
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C5": {
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D1": {
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "D2": {
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "D3": {
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "D4": {
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00", "19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "D5": {
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "E1": {
+     "Lunes": ["08:30 - 09:15", "09:15 - 10:00"],
+     "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "E2": {
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "E3": {
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "E4": {
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00", "19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "E5": {
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    }
+  },
+  "CIR305": {
+    "A1": {
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15"]
+    },
+    "A2": {
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15"]
+    },
+    "A3": {
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15"]
+    },
+    "A4": {
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"]
+    },
+    "A5": {
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"]
+    },
+    "B1": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "B2": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "B3": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "B4": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "B5": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "C1": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"]
+    },
+    "C2": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"]
+    },
+    "C3": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "C4": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"]
+    },
+    "C5": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "D1": {
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "D2": {
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D3": {
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "D4": {
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D5": {
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "E1": {
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "E2": {
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "E3": {
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "E4": {
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "E5": {
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"],
+    }
+  },
+  "SAP300": {
+    "A1": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"]
+    },
+    "B1": {
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "C1": {
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"]
+    },
+    "D1": {
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"]
+    }
+  },
+        // ***** CUARTO AÑO *****
+  "MED400": {
+    "A1": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "A2": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"]
+    },
+    "A3": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"]
+    },
+    "A4": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Sábado": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"]
+    },
+    "A5": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Sábado": ["15:15 - 16:00", "16:00 - 16:45", "19:45 - 20:30", "20:30 - 21:15"]
+    },
+    "B1": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30"]
+    },
+    "B2": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30", "19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "B3": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30"]
+    },
+    "B4": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15", "15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "B5": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"]
+    },
+    "C1": {
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "C2": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Sábado": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"]
+    },
+    "C3": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"]
+    },
+    "C4": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"]
+    },
+    "C5": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "D1": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Sábado": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"]
+    },
+    "D2": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15", "10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"]
+    },
+    "D3": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Sábado": ["18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"]
+    },
+    "D4": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "D5": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "E1": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"]
+    },
+    "E2": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Sábado": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"]
+    },
+    "E3": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Sábado": ["18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"]
+    },
+    "E4": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"]
+    },
+    "E5": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00", "19:45 - 20:30", "20:30 - 21:15"],
+    }
+  },
+  "CIR400": {
+    "A1": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "A2": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "A3": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "B1": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45"]
+    },
+    "B2": {
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30", "19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "B3": {
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "C1": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "C2": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "C3": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30", "10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "D1": {
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"]
+    },
+    "D2": {
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45", "15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["18:15 - 19:00", "19:00 - 19:45"]
+    },
+    "D3": {
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"]
+    },
+    "E1": {
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"]
+    },
+    "E2": {
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15","18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["18:15 - 19:00", "19:00 - 19:45"]
+    },
+    "E3": {
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"]
+    }
+  },
+  "CIR401": {
+    "A1": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30", "10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "A2": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "A3": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "A4": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "A5": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30"]
+    },
+    "B1": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30", "10:00 - 10:45", "10:45 - 11:30"]
+    },
+    "B2": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"]
+    },
+    "B3": {
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00", "07:00 - 07:45", "07:45 - 08:30"]
+    },
+    "B4": {
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+    },    
+     "B5": {
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "C1": {
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "C2": {
+      "Martes": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "C3": {
+      "Martes": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "C4": {
+      "Martes": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "C5": {
+      "Martes": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "D1": {
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "D2": {
+      "Martes": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "D3": {
+      "Martes": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "D4": {
+      "Martes": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "D5": {
+      "Martes": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00"]
+    }
+  },
+  "CIR402": {
+    "A1": {
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "A2": {
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30", "19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "A3": {
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "A4": {
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "A5": {
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B1": {
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B2": {
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30", "19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "B3": {
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B4": {
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B5": {
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "C1": {
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "C2": {
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00", "19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "C3": {
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "C4": {
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "C5": {
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D1": {
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D2": {
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D3": {
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00", "19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "D4": {
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D5": {
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00"],
+    }
+  },
+  "CIR403": {
+    "A1": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "A2": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30"]
+    },
+    "A3": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "A4": {
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "A5": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B1": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "B2": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B3": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "B4": {
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "B5": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C1": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C2": {
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "C3": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C4": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C5": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D1": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D2": {
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "D3": {
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D4": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D5": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+    }
+  },
+  "MED405": {
+    "A1": {
+      "Lunes": ["13:00 - 13:45", "13:45 - 14:30"],
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "A2": {
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Lunes": ["13:00 - 13:45", "13:45 - 14:30"],
+    },
+    "A3": {
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00", "13:00 - 13:45", "13:45 - 14:30"],
+    },
+    "A4": {
+      "Lunes": ["13:00 - 13:45", "13:45 - 14:30"],
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "A5": {
+      "Lunes": ["13:00 - 13:45", "13:45 - 14:30"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B1": {
+      "Martes": ["13:00 - 13:45", "13:45 - 14:30"],
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B2": {
+      "Martes": ["13:00 - 13:45", "13:45 - 14:30"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B3": {
+      "Martes": ["13:00 - 13:45", "13:45 - 14:30"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "B4": {
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00", "13:00 - 13:45", "13:45 - 14:30"],
+    },
+    "B5": {
+      "Martes": ["13:00 - 13:45", "13:45 - 14:30"],
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C1": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C2": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C3": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C4": {
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "C5": {
+     "Miércoles": ["16:45 - 17:30", "17:30 - 18:15"],
+     "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D1": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D2": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D3": {
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "D4": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D5": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00"],
+    }
+  },
+  "MED413": {
+    "A1": {
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "A2": {
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "A3": {
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "A4": {
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "A5": {
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B1": {
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B2": {
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "B3": {
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B4": {
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B5": {
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C1": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "C2": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"], 
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "C3": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "C4": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "C5": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "D1": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "D2": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"], 
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "D3": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"], 
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "D4": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"], 
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30"],
+    },
+    "D5": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"], 
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30"],
+    }
+  },
+  "MED415": {
+    "A1": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "A2": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "A3": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "A4": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "A5": {
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "B1": {
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "B2": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "B3": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "B4": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00"],
+    }, 
+    "B5": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "C1": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "C2": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "C3": {
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "C4": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "C5": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "D1": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D2": {
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D3": {
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "D4": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D5": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"],
+    }
+  },
+  "SAP400": {
+    "A1": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"],
+    },    
+    "B1": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30"],
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "C1": {
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+    }
+  },
+        // ***** QUINTO AÑO *****
+  "MED500": {
+    "A1": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "A2": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "A3": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "A4": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "A5": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Sábado": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "B1": {
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"],
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "B2": {
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "B3": {
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "B4": {
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"],
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B5": {
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"],
+      "Sábado": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "C1": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "C2": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Sábado": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "C3": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Sábado": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "C4": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "C5": {
+      "Lunes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "E1": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45", "19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "E2": {
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "E3": {
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "E4": {
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "E5": {
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45", "19:45 - 20:30", "20:30 - 21:15"],
+}  
+},
+  "MED501": {
+    "A1": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "A2": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "A3": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "A4": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "A5": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B1": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B2": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B3": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "B4": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "B5": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "C1": {
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Miércoles": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C2": {
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C3": {
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C4": {
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "C5": {
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D1": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D2": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Miércoles": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D3": {
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00", "13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "D4": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D5": {
+      "Lunes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00"],
+} 
+ },
+  "MED504": {
+    "B1": {
+      "Martes": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Miércoles": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Sábado": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "B2": {
+      "Martes": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Miércoles": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Sábado": ["13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00"]
+    },
+    "B3": {
+      "Martes": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Miércoles": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Sábado": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "B4": {
+      "Martes": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Miércoles": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "B5": {
+      "Martes": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Miércoles": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Lunes": ["12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "C1": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Sábado": ["13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15", "52:15 - 16:00"],
+    },
+    "C2": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"], 
+    },
+    "C3": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+
+    },
+    "C4": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Miércoles": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "C5": {
+      "Martes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Sábado": ["16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00"]
+    },
+    "D1": {
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D2": {
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "D3": {
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "D4": {
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "D5": {
+      "Martes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+} 
+ },
+  "CIR500": {
+    "A1": {
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "A2": {
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+      "Martes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "A3": {
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+      "Miércoles": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "A4": {
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B1": {
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Sábado": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "B2": {
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "B3": {
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Sábado": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "B4": {
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Jueves": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+  },
+    "C1": {
+      "Sábado": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Martes": ["12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "C2": {
+      "Sábado": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Sábado": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "C3": {
+      "Sábado": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Jueves": ["12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "C4": {
+      "Sábado": ["08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15"]
+  },
+    "D1": {
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Miércoles": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "D2": {
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30"],
+    },
+    "D3": {
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Viernes": ["13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00", "16:00 - 16:45"],
+    },
+    "D4": {
+      "Martes": ["13:45 - 14:30", "14:30 - 15:15"],
+      "Jueves": ["21:15 - 22:00", "22:00 - 22:45"],
+      "Jueves": ["08:30 - 09:15", "09:15 - 10:00", "10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+} 
+ },
+  "CIR505": {
+    "A1": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "A2": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "A3": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+      "Lunes": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "A4": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "A5": {
+      "Miércoles": ["16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00", "22:00 - 22:45"],
+    },
+    "B1": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00", "12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "B2": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Jueves": ["13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00"], 
+    },
+    "B3": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Miércoles": ["13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00"], 
+    },
+    "B4": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Martes": ["13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00"], 
+    },
+    "B5": {
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+      "Viernes": ["13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00"], 
+    },
+    "C1": {
+      "Miércoles": ["12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15"],
+      "Lunes": ["07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C2": {
+      "Miércoles": ["12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15"],
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"], 
+    },
+    "C3": {
+      "Miércoles": ["12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15"],
+      "Lunes": ["13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00"], 
+    },
+    "C4": {
+      "Miércoles": ["12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15"],
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"], 
+    },
+    "C5": {
+      "Miércoles": ["12:15 - 13:00", "13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15"],
+      "Martes": ["18:15 - 19:00", "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15"], 
+    },
+    "D1": {
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00", "18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "D2": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"], 
+    },
+    "D3": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00", "18:15 - 19:00", "19:00 - 19:45"],
+    },
+    "D4": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"], 
+    },
+    "D5": {
+      "Lunes": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Miércoles": ["18:15 - 19:00", "19:00 - 19:45"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00"],
+} 
+ },
+  "CIR506": {
+    "A1": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "A2": {
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "A3": {
+      "Jueves": ["13:00 - 13:45", "13:45 - 14:30", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "A4": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["13:00 - 13:45", "13:45 - 14:30"]
+    },
+    "A5": {
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "B1": {
+      "Viernes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["13:45 - 14:30", "14:30 - 15:15"],
+    },
+    "B2": {
+      "Viernes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["10:00 - 10:45", "10:45 - 11:30"]
+    },
+    "B3": {
+      "Viernes": ["10:00 - 10:45", "10:45 - 11:30", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "B4": {
+      "Viernes": ["11:30 - 12:15", "12:15 - 13:00", "16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "B5": {
+      "Viernes": ["16:45 - 17:30", "17:30 - 18:15"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"]
+    },
+    "C1": {
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "C2": {
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "C3": {
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Martes": ["08:30 - 09:15", "09:15 - 10:00"],
+    },
+    "C4": {
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "C5": {
+      "Viernes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00"],
+  },
+    "D1": {
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Martes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "D2": {
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Lunes": ["10:00 - 10:45", "10:45 - 11:30"],
+    },
+    "D3": {
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D4": {
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Lunes": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "D5": {
+      "Jueves": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Lunes": ["08:30 - 09:15", "09:15 - 10:00"],
+}
+  },
+  "MED508": {
+    "A1": {
+      "Miércoles": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["16:45 - 17:30", "17:30 - 18:15"],
+    },
+    "B1": {
+      "Martes": ["11:30 - 12:15", "12:15 - 13:00"],
+      "Jueves": ["11:30 - 12:15", "12:15 - 13:00"],
+    },
+    "C1": {
+      "Martes": ["19:45 - 20:30", "20:30 - 21:15"],
+      "Jueves": ["19:45 - 20:30", "20:30 - 21:15"],
+    },
+    "D1": {
+      "Lunes": ["15:15 - 16:00", "16:00 - 16:45"],
+      "Jueves": ["18:15 - 19:00", "19:00 - 19:45"],
+}    
+},	
+    };
+
+
+    // ==================== TEXTOS DE DOCENTES ====================
+    // IMPORTANTE: Usar la misma nomenclatura que en horariosMaterias
+    const textosPersonalizados = {
+
+        // PRIMER AÑO
+  "MED100": {
+    "A1": "Dr. Raul Pedraza", "A2": "Dr. Raul Pedraza", "A3": "Dr. Raul Pedraza",
+    "B1": "Dr. Jose Luis Sossa Lino", "B2": "Dr. Jose Luis Sossa Lino", "B3": "Dr. Jose Luis Sossa Lino",
+    "C1": "Dr. Edgar Sempertegui", "C2": "Dr. Edgar Sempertegui", "C3": "Dr. Edgar Sempertegui",
+    "D1": "Dr. Adolfo Oropeza", "D2": "Dr. Adolfo Oropeza", "D3": "Dr. Adolfo Oropeza",
+    "E1": "Dr. Oscar Aguilar", "E2": "Dr. Oscar Aguilar", "E3": "Dr. Oscar Aguilar",
+    "F1": "Dr. Pedro Dorado", "F2": "Dr. Pedro Dorado", "F3": "Dr. Pedro Dorado",
+    "G1": "Dr. Jose Luis Sossa Lino", "G2": "Dr. Jose Luis Sossa Lino", "G3": "Dr. Jose Luis Sossa Lino",
+    "H1": "Dr. Pedro Dorado", "H2": "Dr. Pedro Dorado", "H3": "Dr. Pedro Dorado"
+  },
+  "MED101": {
+    "A1": "Dr. Dario Sánchez", "A2": "Dr. Dario Sánchez", "A3": "Dr. Dario Sánchez",
+    "B1": "Dr. Ariel Sangueza", "B2": "Dr. Ariel Sangueza", "B3": "Dr. Ariel Sangueza",
+    "C1": "Dr. Norberto Iriarte", "C2": "Dr. Norberto Iriarte", "C3": "Dr. Norberto Iriarte",
+    "D1": "Dr. Raul Laguna", "D2": "Dr. Raul Laguna", "D3": "Dr. Raul Laguna",
+    "E1": "Dr. Harold Percy Rivero", "E2": "Dr. Harold Percy Rivero",
+    "F1": "Dr. Ariel Sangueza", "F2": "Dr. Ariel Sangueza", "F3": "Dr. Ariel Sangueza",
+    "G1": "Dr. Norberto Iriarte", "G2": "Dr. Norberto Iriarte", "G3": "Dr. Norberto Iriarte",
+    "H1": "Dr. Dario Sánchez", "H2": "Dr. Dario Sánchez", "H3": "Dr. Dario Sánchez"
+  },
+  "SAP100": {
+    "A1": "Dr. Harold Percy Rivero",
+    "B1": "Dr. Harold Percy Rivero",
+    "C1": "Dr. Harold Percy Rivero",
+    "D1": "Dr. Harold Percy Rivero",
+    "E1": "Dr. Harold Percy Rivero",
+    "F1": "Dr. Harold Percy Rivero",
+    "G1": "Dr. Williams Rivera",
+    "H1": "Dr. Williams Rivera"
+  },
+  "MAF100": {
+    "A1": "Dr. Reymi Ferreira",
+    "B1": "Dr. Reymi Ferreira",
+    "C1": "Dr. Harold Percy Rivero",
+    "D1": "Dr. Harold Percy Rivero",
+    "E1": "Dr. Harold Percy Rivero",
+    "F1": "Dr. Harold Percy Rivero",
+    "G1": "Dr. Harold Percy Rivero",
+    "H1": "Dr. Harold Percy Rivero"
+  },
+        // PRIMER AÑO
+ "MED200": {
+    "A1": "Dr.  Juan J. Machado",
+    "A2": "Dr.  Juan J. Machado",
+    "A3": "Dr.  Juan J. Machado",
+    "B1": "Dr. Ariel Sangueza",
+    "B2": "Dr. Ariel Sangueza",
+    "B3": "Dr. Ariel Sangueza",
+    "C1": "Dr. Ariel Sangueza",
+    "C2": "Dr. Ariel Sangueza",
+    "C3": "Dr. Ariel Sangueza",
+    "D1": "Dr.  Juan Machado",
+    "D2": "Dr.  Juan Machado",
+    "D3": "Dr.  Juan Machado",
+    "E1": "Dr.  Juan Machado",
+    "E2": "Dr.  Juan Machado",
+    "E3": "Dr.  Juan Machado",
+    "F1": "Dr.  Juan Machado",
+    "F2": "Dr.  Juan Machado",
+    "F3": "Dr.  Juan Machado"
+  },
+  "MED201": {
+    "A1": "Dra. Elizabeth Chely",
+    "A2": "Dra. Elizabeth Chely",
+    "A3": "Dra. Elizabeth Chely",
+    "B1": "Dra. Maria Elena Arauz",
+    "B2": "Dra. Maria Elena Arauz",
+    "B3": "Dra. Maria Elena Arauz",
+    "C1": "Dra. Elizabeth Chely",
+    "C2": "Dra. Elizabeth Chely",
+    "C3": "Dra. Elizabeth Chely",
+    "D1": "Dra. Elizabeth Chely",
+    "D2": "Dra. Elizabeth Chely",
+    "D3": "Dra. Elizabeth Chely",
+    "E1": "Dra. Maria Elena Arauz",
+    "E2": "Dra. Maria Elena Arauz",
+    "E3": "Dra. Maria Elena Arauz",
+    "F1": "Dra. Carmela Tapia",
+    "F2": "Dra. Carmela Tapia",
+    "F3": "Dra. Carmela Tapia"
+  },
+  "MED202": {
+    "A1": "Por designar",
+    "A2": "Por designar",
+    "A3": "Por designar",
+    "B1": "Dr. Williams Rivera",
+    "B2": "Dr. Williams Rivera",
+    "B3": "Dr. Williams Rivera",
+    "C1": "Por designar",
+    "C2": "Por designar",
+    "C3": "Por designar",
+    "D1": "Dr. Alberto Mendez",
+    "D2": "Dr. Alberto Mendez",
+    "D3": "Dr. Alberto Mendez",
+    "E1": "Por designar",
+    "E2": "Por designar",
+    "E3": "Por designar",
+    "F1": "Por designar",
+    "F2": "Por designar",
+    "F3": "Por designar"
+  },
+  "MED203": {
+    "A1": "Dra. Martha Quiroz",
+    "A2": "Dra. Martha Quiroz",
+    "A3": "Dra. Martha Quiroz",
+    "B1": "Dra. Yandira Pinto",
+    "B2": "Dra. Yandira Pinto",
+    "B3": "Dra. Yandira Pinto",
+    "C1": "Dra. Martha Quiroz",
+    "C2": "Dra. Martha Quiroz",
+    "C3": "Dra. Martha Quiroz",
+    "D1": "Dra. Yandira Pinto",
+    "D2": "Dra. Yandira Pinto",
+    "D3": "Dra. Yandira Pinto",
+    "E1": "Dra. Elizabeth Hidalgo",
+    "E2": "Dra. Elizabeth Hidalgo",
+    "E3": "Dra. Elizabeth Hidalgo",
+    "F1": "Por designar",
+    "F2": "Por designar",
+    "F3": "Por designar"
+  },
+  "MED209": {
+    "A1": "Dr. Hugo Cuellar",
+    "A2": "Dr. Hugo Cuellar",
+    "A3": "Dr. Hugo Cuellar",
+    "B1": "Dra. Martha Quiroz",
+    "B2": "Dra. Martha Quiroz",
+    "B3": "Dra. Martha Quiroz",
+    "C1": "Dra. Martha Quiroz",
+    "C2": "Dra. Martha Quiroz",
+    "C3": "Dra. Martha Quiroz",
+    "D1": "Dra. Maria Elena Arauz",
+    "D2": "Dra. Maria Elena Arauz",
+    "D3": "Dra. Maria Elena Arauz",
+    "E1": "Dr. Daniel Ortiz",
+    "E2": "Dr. Daniel Ortiz",
+    "E3": "Dr. Daniel Ortiz",
+    "F1": "Dra. Juan Saavedra",
+    "F2": "Dra. Juan Saavedra",
+    "F3": "Dra. Juan Saavedra"
+  },
+  "SAP200": {
+    "A1": "Dr. Omar Leaño",
+    "B1": "Por designar",
+    "C1": "Dr. Omar Leaño",
+    "D1": "Dr. Omar Leaño",
+    "E1": "Dr. Omar Leaño",
+    "F1": "Dr. Virgilio Prieto"
+  },
+// TERCER AÑO
+  "MED301": {
+    "A1": "Dr. Javier Aguilar",
+    "B1": "Dr. Javier Aguilar",
+    "C1": "Dra. Tatiana Maida",
+    "D1": "Dr. Pedro Dorado",
+    "E1": "Por designar"
+  },
+  "MED302": {
+    "A1": "Dr. Mirko Terrazas",
+    "A2": "Dr. Mirko Terrazas",
+    "A3": "Dr. Mirko Terrazas",
+    "A4": "Dr. Mirko Terrazas",
+    "A5": "Dr. Mirko Terrazas",
+    "B1": "Dr. Jorge Arce",
+    "B2": "Dr. Jorge Arce",
+    "B3": "Dr. Jorge Arce",
+    "B4": "Dr. Jorge Arce",
+    "B5": "Dr. Jorge Arce",
+    "C1": "Dra. Katty Panozo",
+    "C2": "Dra. Katty Panozo",
+    "C3": "Dra. Katty Panozo",
+    "C4": "Dra. Katty Panozo",
+    "C5": "Dra. Katty Panozo",
+    "D1": "Por designar",
+    "D2": "Por designar",
+    "D3": "Por designar",
+    "D4": "Por designar",
+    "D5": "Por designar",
+    "E1": "Por designar",
+    "E2": "Por designar",
+    "E3": "Por designar",
+    "E4": "Por designar",
+    "E5": "Por designar"
+  },
+  "MED303": {
+    "A1": "Dr. Hugo Von Borries",
+    "A2": "Dr. Hugo Von Borries",
+    "A3": "Dr. Hugo Von Borries",
+    "A4": "Dr. Hugo Von Borries",
+    "B1": "Dr. Hugo Von Borries",
+    "B2": "Dr. Hugo Von Borries",
+    "B3": "Dr. Hugo Von Borries",
+    "B4": "No hay oferta",
+    "C1": "Dra. Erika Dajer",
+    "C2": "Dra. Erika Dajer",
+    "C3": "Dra. Erika Dajer",
+    "C4": "No hay oferta",
+    "D1": "Por designar",
+    "D2": "Por designar",
+    "D3": "Por designar",
+    "D4": "No hay oferta",
+    "E1": "Por designar",
+    "E2": "Por designar",
+    "E3": "Por designar",
+    "E4": "No hay oferta",
+    "F1": "Por designar",
+    "F2": "Por designar",
+    "F3": "Por designar",
+    "F4": "No hay oferta",
+    "G1": "Por designar",
+    "G2": "Por designar",
+    "G3": "Por designar",
+    "G4": "No hay oferta"
+  },
+  "MED304": {
+    "A1": "Por designar",
+    "A2": "Por designar",
+    "A3": "Por designar",
+    "A4": "Por designar",
+    "A5": "Por designar",
+    "B1": "Dr. Juan Saavedra",
+    "B2": "Dr. Juan Saavedra",
+    "B3": "Dr. Juan Saavedra",
+    "B4": "Dr. Juan Saavedra",
+    "B5": "Dr. Juan Saavedra",
+    "C1": "Dr. Juan Saavedra",
+    "C2": "Dr. Juan Saavedra",
+    "C3": "Dr. Juan Saavedra",
+    "C4": "Dr. Juan Saavedra",
+    "C5": "Dr. Juan Saavedra",
+    "D1": "Por designar",
+    "D2": "Por designar",
+    "D3": "Por designar",
+    "D4": "Por designar",
+    "D5": "Por designar",
+    "E1": "Por designar",
+    "E2": "Por designar",
+    "E3": "Por designar",
+    "E4": "Por designar",
+    "E5": "Por designar"
+  },
+  "CIR305": {
+    "A1": "Dr. Jorge Coronado",
+    "A2": "Dr. Jorge Coronado",
+    "A3": "Dr. Jorge Coronado",
+    "A4": "Dr. Jorge Coronado",
+    "A5": "Dr. Jorge Coronado",
+    "B1": "Dr. Oscar Aguilar",
+    "B2": "Dr. Oscar Aguilar",
+    "B3": "Dr. Oscar Aguilar",
+    "B4": "Dr. Oscar Aguilar",
+    "B5": "Dr. Oscar Aguilar",
+    "C1": "Dr. Reinerio Vargas",
+    "C2": "Dr. Reinerio Vargas",
+    "C3": "Dr. Reinerio Vargas",
+    "C4": "Dr. Reinerio Vargas",
+    "C5": "Dr. Reinerio Vargas",
+    "D1": "Dr. Oscar Aguilar",
+    "D2": "Dr. Oscar Aguilar",
+    "D3": "Dr. Oscar Aguilar",
+    "D4": "Dr. Oscar Aguilar",
+    "D5": "Dr. Oscar Aguilar",
+    "E1": "Por designar",
+    "E2": "Por designar",
+    "E3": "Por designar",
+    "E4": "Por designar",
+    "E5": "Por designar"
+  },
+  "SAP300": {
+    "A1": "Dr. Dario Sánchez",
+    "B1": "Dr. Alberto Mendez",
+    "C1": "Dra. Lilian Zambrana",
+    "D1": "Por designar"
+  },
+// CUARTO AÑO
+  "MED400": {
+    "A1": "Dr. Javier Alcazar",
+    "A2": "Dr. Javier Alcazar",
+    "A3": "Dr. Javier Alcazar",
+    "A4": "Dr. Javier Alcazar",
+    "A5": "Dr. Javier Alcazar",
+    "B1": "Dr. Omar Gandarilla",
+    "B2": "Dr. Omar Gandarilla",
+    "B3": "Dr. Omar Gandarilla",
+    "B4": "Dr. Omar Gandarilla",
+    "B5": "Dr. Omar Gandarilla",
+    "C1": "Dr. German Toledo",
+    "C2": "Dr. German Toledo",
+    "C3": "Dr. German Toledo",
+    "C4": "Dr. German Toledo",
+    "C5": "Dr. German Toledo",
+    "D1": "Por designar",
+    "D2": "Por designar",
+    "D3": "Por designar",
+    "D4": "Por designar",
+    "D5": "Por designar",
+    "E1": "Por designar",
+    "E2": "Por designar",
+    "E3": "Por designar",
+    "E4": "Por designar",
+    "E5": "Por designar"
+  },
+  "CIR400": {
+    "A1": "Dr. Jose Luis Aponte",
+    "A2": "Dr. Jose Luis Aponte",
+    "A3": "Dr. Jose Luis Aponte",
+    "B1": "Dr. Eduardo Flores",
+    "B2": "Dr. Eduardo Flores",
+    "B3": "Dr. Eduardo Flores",
+    "C1": "Dr. Reinerio Vargas",
+    "C2": "Dr. Reinerio Vargas",
+    "C3": "Dr. Reinerio Vargas",
+    "D1": "Dr. Erwin Viruez",
+    "D2": "Dr. Erwin Viruez",
+    "D3": "Dr. Erwin Viruez",
+    "E1": "Por designar",
+    "E2": "Por designar",
+    "E3": "Por designar"
+  },
+  "CIR401": {
+    "A1": "Por designar",
+    "A2": "Por designar",
+    "A3": "Por designar",
+    "A4": "Por designar",
+    "A5": "Por designar",
+    "B1": "Por designar",
+    "B2": "Por designar",
+    "B3": "Por designar",
+    "B4": "Por designar",
+    "C1": "Dr. Edgar Sempertegui",
+    "C2": "Dr. Edgar Sempertegui",
+    "C3": "Dr. Edgar Sempertegui",
+    "C4": "Dr. Edgar Sempertegui",
+    "C5": "Dr. Edgar Sempertegui",
+    "D1": "Dr. Edgar Sempertegui",
+    "D2": "Dr. Edgar Sempertegui",
+    "D3": "Dr. Edgar Sempertegui",
+    "D4": "Dr. Edgar Sempertegui",
+    "D5": "Dr. Edgar Sempertegui"
+  },
+  "CIR402": {
+    "A1": "Dr. Rafael Molina",
+    "A2": "Dr. Rafael Molina",
+    "A3": "Dr. Rafael Molina",
+    "A4": "Dr. Rafael Molina",
+    "B1": "Dr. Rafael Molina",
+    "B2": "Dr. Rafael Molina",
+    "B3": "Dr. Rafael Molina",
+    "B4": "Dr. Rafael Molina",
+    "B5": "Dr. Rafael Molina",
+    "C1": "Dr. Rafael Molina",
+    "C2": "Dr. Rafael Molina",
+    "C3": "Dr. Rafael Molina",
+    "C4": "Dr. Rafael Molina",
+    "C5": "Dr. Rafael Molina",
+    "D1": "Dr. Rafael Molina",
+    "D2": "Dr. Rafael Molina",
+    "D3": "Dr. Rafael Molina",
+    "D4": "Dr. Rafael Molina",
+    "D5": "Dr. Rafael Molina"
+  },
+  "CIR403": {
+    "A1": "Dr. Adolfo Oropeza",
+    "A2": "Dr. Adolfo Oropeza",
+    "A3": "Dr. Adolfo Oropeza",
+    "A4": "Dr. Adolfo Oropeza",
+    "A5": "Dr. Adolfo Oropeza",
+    "B1": "Dr. Adolfo Oropeza",
+    "B2": "Dr. Adolfo Oropeza",
+    "B3": "Dr. Adolfo Oropeza",
+    "B4": "Dr. Adolfo Oropeza",
+    "B5": "Dr. Adolfo Oropeza",
+    "C1": "Dr. Carlos Quiroga ",
+    "C2": "Dr. Carlos Quiroga ",
+    "C3": "Dr. Carlos Quiroga ",
+    "C4": "Dr. Carlos Quiroga ",
+    "C5": "Dr. Carlos Quiroga ",
+    "D1": "Dr. Carlos Quiroga ",
+    "D2": "Dr. Carlos Quiroga ",
+    "D3": "Dr. Carlos Quiroga ",
+    "D4": "Dr. Carlos Quiroga ",
+    "D5": "Dr. Carlos Quiroga "
+  },
+  "MED405": {
+    "A1": "Dr. Gueider Salas",
+    "A2": "Dr. Gueider Salas",
+    "A3": "Dr. Gueider Salas",
+    "A4": "Dr. Gueider Salas",
+    "A5": "Dr. Gueider Salas",
+    "B1": "Dr. Gueider Salas",
+    "B2": "Dr. Gueider Salas",
+    "B3": "Dr. Gueider Salas",
+    "B4": "Dr. Gueider Salas",
+    "B5": "Dr. Gueider Salas",
+    "C1": "Dr. Remberto Osinaga",
+    "C2": "Dr. Remberto Osinaga",
+    "C3": "Dr. Remberto Osinaga",
+    "C4": "Dr. Remberto Osinaga",
+    "C5": "Dr. Remberto Osinaga",
+    "D1": "Dr. Remberto Osinaga",
+    "D2": "Dr. Remberto Osinaga",
+    "D3": "Dr. Remberto Osinaga",
+    "D4": "Dr. Remberto Osinaga",
+    "D5": "Dr. Remberto Osinaga"
+  },
+  "MED413": {
+    "A1": "Dra. Maria Pavez",
+    "A2": "Dra. Maria Pavez",
+    "A3": "Dra. Maria Pavez",
+    "A4": "Dra. Maria Pavez",
+    "A5": "Dra. Maria Pavez",
+    "B1": "Dra. Maria Pavez",
+    "B2": "Dra. Maria Pavez",
+    "B3": "Dra. Maria Pavez",
+    "B4": "Dra. Maria Pavez",
+    "B5": "Dra. Maria Pavez",
+    "C1": "Dra. Maria Pavez",
+    "C2": "Dra. Maria Pavez",
+    "C3": "Dra. Maria Pavez",
+    "C4": "Dra. Maria Pavez",
+    "C5": "Dra. Maria Pavez",
+    "D1": "Dra. Maria Pavez",
+    "D2": "Dra. Maria Pavez",
+    "D3": "Dra. Maria Pavez",
+    "D4": "Dra. Maria Pavez",
+    "D5": "Dra. Maria Pavez"
+  },
+  "MED415": {
+    "A1": "Dr. David Schlusselberg",
+    "A2": "Dr. David Schlusselberg",
+    "A3": "Dr. David Schlusselberg",
+    "A4": "Dr. David Schlusselberg",
+    "A5": "Dr. David Schlusselberg",
+    "B1": "Dr. David Schlusselberg",
+    "B2": "Dr. David Schlusselberg",
+    "B3": "Dr. David Schlusselberg",
+    "B4": "Dr. David Schlusselberg",
+    "B5": "Dr. David Schlusselberg",
+    "C1": "Dr. David Schlusselberg",
+    "C2": "Dr. David Schlusselberg",
+    "C3": "Dr. David Schlusselberg",
+    "C4": "Dr. David Schlusselberg",
+    "C5": "Dr. David Schlusselberg",
+    "D1": "Dra. Elba Soto",
+    "D2": "Dra. Elba Soto",
+    "D3": "Dra. Elba Soto",
+    "D4": "Dra. Elba Soto",
+    "D5": "Dra. Elba Soto"
+  },
+  "SAP400": {
+    "A1": "Por designar",
+    "B1": "Por designar",
+    "C1": "Dr. Virgilio Prieto"
+  },
+// QUINTO AÑO
+  "MED500": {
+    "A1": "Dr. Victor Hugo Vargas",
+    "A2": "Dr. Victor Hugo Vargas",
+    "A3": "Dr. Victor Hugo Vargas",
+    "A4": "Dr. Victor Hugo Vargas",
+    "A5": "Dr. Victor Hugo Vargas",
+    "B1": "Dr. Marcelo Mendez",
+    "B2": "Dr. Marcelo Mendez",
+    "B3": "Dr. Marcelo Mendez",
+    "B4": "Dr. Marcelo Mendez",
+    "B5": "Dr. Marcelo Mendez",
+    "C1": "Dr. Wilfredo Anzoategui",
+    "C2": "Dr. Wilfredo Anzoategui",
+    "C3": "Dr. Wilfredo Anzoategui",
+    "C4": "Dr. Wilfredo Anzoategui",
+    "C5": "Dr. Wilfredo Anzoategui",
+    "D1": "No hay oferta",
+    "D2": "No hay oferta",
+    "D3": "No hay oferta",
+    "D4": "No hay oferta",
+    "D5": "No hay oferta",
+    "E1": "Dr. Grover Aguilar",
+    "E2": "Dr. Grover Aguilar",
+    "E3": "Dr. Grover Aguilar",
+    "E4": "Dr. Grover Aguilar",
+    "E5": "Dr. Grover Aguilar"
+  },
+  "MED501": {
+    "A1": "Dr. David Schlusselberg",
+    "A2": "Dr. David Schlusselberg",
+    "A3": "Dr. David Schlusselberg",
+    "A4": "Dr. David Schlusselberg",
+    "A5": "Dr. David Schlusselberg",
+    "B1": "Dr. David Schlusselberg",
+    "B2": "Dr. David Schlusselberg",
+    "B3": "Dr. David Schlusselberg",
+    "B4": "Dr. David Schlusselberg",
+    "B5": "Dr. David Schlusselberg",
+    "C1": "Dr. David Schlusselberg",
+    "C2": "Dr. David Schlusselberg",
+    "C3": "Dr. David Schlusselberg",
+    "C4": "Dr. David Schlusselberg",
+    "C5": "Dr. David Schlusselberg",
+    "D1": "Dra. Elba Soto",
+    "D2": "Dra. Elba Soto",
+    "D3": "Dra. Elba Soto",
+    "D4": "Dra. Elba Soto",
+    "D5": "Dra. Elba Soto"
+  },
+  "MED504": {
+    "A1": "No hay oferta",
+    "A2": "No hay oferta",
+    "A3": "No hay oferta",
+    "A4": "No hay oferta",
+    "A5": "No hay oferta",
+    "B1": "Dr. Raul Laguna",
+    "B2": "Dr. Raul Laguna",
+    "B3": "Dr. Raul Laguna",
+    "B4": "Dr. Raul Laguna",
+    "B5": "Dr. Raul Laguna",
+    "C1": "Dra. Gloria Moron",
+    "C2": "Dra. Gloria Moron",
+    "C3": "Dra. Gloria Moron",
+    "C4": "Dra. Gloria Moron",
+    "C5": "Dra. Gloria Moron",    
+    "D1": "Dra. Gloria Moron",
+    "D2": "Dra. Gloria Moron",
+    "D3": "Dra. Gloria Moron",
+    "D4": "Dra. Gloria Moron",
+    "D5": "Dra. Gloria Moron"
+  },
+  "CIR500": {
+    "A1": "Dr. Jorge Coronado",
+    "A2": "Dr. Jorge Coronado",
+    "A3": "Dr. Jorge Coronado",
+    "A4": "Dr. Jorge Coronado",
+    "B1": "Dr. Jorge Aparicio",
+    "B2": "Dr. Jorge Aparicio",
+    "B3": "Dr. Jorge Aparicio",
+    "B4": "Dr. Jorge Aparicio",
+    "C1": "Dr. Jorge Verastegui",
+    "C2": "Dr. Jorge Verastegui",
+    "C3": "Dr. Jorge Verastegui",
+    "C4": "Dr. Jorge Verastegui",
+    "D1": "Por Designar",
+    "D2": "Por Designar",
+    "D3": "Por Designar",
+    "D4": "Por Designar"
+  },
+  "CIR505": {
+    "A1": "Dr. Edgar Caballero",
+    "A2": "Dr. Edgar Caballero",
+    "A3": "Dr. Edgar Caballero",
+    "A4": "Dr. Edgar Caballero",
+    "A5": "Dr. Edgar Caballero",
+    "B1": "Por Designar",
+    "B2": "Por Designar",
+    "B3": "Por Designar",
+    "B4": "Por Designar",
+    "B5": "Por Designar",
+    "C1": "Dr. Leoncio Encinas",
+    "C2": "Dr. Leoncio Encinas",
+    "C3": "Dr. Leoncio Encinas",
+    "C4": "Dr. Leoncio Encinas",
+    "C5": "Dr. Leoncio Encinas",
+    "D1": "Dr. Rodolfo Serrano",
+    "D2": "Dr. Rodolfo Serrano",
+    "D3": "Dr. Rodolfo Serrano",
+    "D4": "Dr. Rodolfo Serrano",
+    "D5": "Dr. Rodolfo Serrano"
+  },
+  "CIR506": {
+    "A1": "Dr. Yusef Israel",
+    "A2": "Dr. Yusef Israel",
+    "A3": "Dr. Yusef Israel",
+    "A4": "Dr. Yusef Israel",
+    "A5": "Dr. Yusef Israel",
+    "B1": "Dr. Yusef Israel",
+    "B2": "Dr. Yusef Israel",
+    "B3": "Dr. Yusef Israel",
+    "B4": "Dr. Yusef Israel",
+    "B5": "Dr. Yusef Israel",
+    "C1": "Dr. Yusef Israel",
+    "C2": "Dr. Yusef Israel",
+    "C3": "Dr. Yusef Israel",
+    "C4": "Dr. Yusef Israel",
+    "C5": "Dr. Yusef Israel",
+    "D1": "Dr. Yusef Israel",
+    "D2": "Dr. Yusef Israel",
+    "D3": "Dr. Yusef Israel",
+    "D4": "Dr. Yusef Israel",
+    "D5": "Dr. Yusef Israel"
+  },
+  "MED508": {
+    "A1": "Dr. Dante Mendez",
+    "B1": "Dr. Dante Mendez",
+    "C1": "Dr. Dante Mendez",
+    "D1": "Dr. Dante Mendez"
+  }
+    };
+
+
+    // ==================== FUNCIÓN PARA MOSTRAR NOMBRE DEL SUBGRUPO ====================
+    // Esta función decide si mostrar solo el grupo (para 1 subgrupo) o grupo+número (para múltiples)
+    function obtenerNombreSubgrupo(grupo, numSubgrupo, totalSubgrupos) {
+        if (totalSubgrupos === 1) {
+            // Si solo hay 1 subgrupo, mostrar solo el nombre del grupo (ej: "A", "AM", "VIRTUAL")
+            return grupo;
+        } else {
+            // Si hay múltiples subgrupos, mostrar grupo + número (ej: "A1", "B2")
+            return `${grupo}${numSubgrupo}`;
+        }
+    }
+
+    // ==================== GENERACIÓN DE COLORES ÚNICOS ====================
+    const coloresUnicos = new Map();
+    let totalSubgrupos = 0;
+    const listaSubgrupos = [];
+
+    for (const [codigo, materia] of Object.entries(materias)) {
+        for (const [grupo, numSubgrupos] of Object.entries(materia.grupos)) {
+            for (let j = 1; j <= numSubgrupos; j++) {
+                const subgrupo = `${grupo}${j}`;
+                listaSubgrupos.push({ codigo, subgrupo });
+                totalSubgrupos++;
+            }
+        }
+    }
+
+    function generarColorUnico(indice, total) {
+        const goldenRatio = (1 + Math.sqrt(5)) / 2;
+        const hue = (indice * 360 / goldenRatio) % 360;
+        const saturation = 40 + (indice % 30);
+        const lightness = 60 + (indice % 25);
+        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+
+    for (let i = 0; i < totalSubgrupos; i++) {
+        const color = generarColorUnico(i, totalSubgrupos);
+        const item = listaSubgrupos[i];
+        const key = `${item.codigo}-${item.subgrupo}`;
+        coloresUnicos.set(key, color);
+    }
+
+    const coloresGrupos = {};
+    for (const [codigo, materia] of Object.entries(materias)) {
+        coloresGrupos[codigo] = {};
+        for (const [grupo, numSubgrupos] of Object.entries(materia.grupos)) {
+            for (let j = 1; j <= numSubgrupos; j++) {
+                const subgrupo = `${grupo}${j}`;
+                coloresGrupos[codigo][subgrupo] = coloresUnicos.get(`${codigo}-${subgrupo}`);
+            }
+        }
+    }
+
+    // ==================== FUNCIONES AUXILIARES ====================
+    function obtenerNombreDocenteResumido(nombreCompleto) {
+        if (!nombreCompleto || nombreCompleto === "Por designar") {
+            return nombreCompleto;
+        }
+        return nombreCompleto;
+    }
+
+    window.mostrarMaterias = function(ano) {
+        const contenedorMaterias = document.getElementById(`materias-${ano}`);
+        contenedorMaterias.innerHTML = "";
+        const materiasLista = materiasPorAno[ano] || [];
+        materiasLista.forEach(materia => {
+            const divMateria = document.createElement("div");
+            divMateria.classList.add("materia");
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.value = materia.codigo;
+            checkbox.id = `materia-${materia.codigo}`;
+            const label = document.createElement("label");
+            label.htmlFor = `materia-${materia.codigo}`;
+            label.textContent = materia.nombre;
+            divMateria.appendChild(checkbox);
+            divMateria.appendChild(label);
+            contenedorMaterias.appendChild(divMateria);
+        });
+        contenedorMaterias.style.display = "block";
+    };
+
+    window.mostrarSubgrupos = function(columnaMateria, codigo, grupo, subgruposTotales) {
+        const contenedorSub = columnaMateria.querySelector(`#subgrupos-${codigo}-${grupo}`);
+        if (!contenedorSub) return;
+
+        if (contenedorSub.style.display === 'none' || contenedorSub.innerHTML === '') {
+            contenedorSub.innerHTML = "";
+            for (let j = 1; j <= subgruposTotales; j++) {
+                const nombreVisual = obtenerNombreSubgrupo(grupo, j, subgruposTotales);
+                const subgrupoKey = `${grupo}${j}`;
+                const label = document.createElement("label");
+                const cb = document.createElement("input");
+                cb.type = "checkbox";
+                cb.value = subgrupoKey;
+                cb.id = `subgrupo-${codigo}-${grupo}-${j}`;
+                label.appendChild(cb);
+                label.appendChild(document.createTextNode(" " + nombreVisual));
+                contenedorSub.appendChild(label);
+            }
+        }
+        contenedorSub.style.display = "block";
+    };
+
+    function tienenCruce(horarios1, horarios2) {
+        if (!horarios1 || !horarios2) return false;
+        for (const dia in horarios1) {
+            if (horarios2[dia] && Array.isArray(horarios1[dia]) && Array.isArray(horarios2[dia])) {
+                for (const hora of horarios1[dia]) {
+                    if (horarios2[dia].includes(hora)) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // ==================== MOSTRAR HORARIO ====================
+    function mostrarPantallaHorario(materiasSeleccionadasArray) {
+        document.querySelector('#contenedor-anos').style.display = 'none';
+        document.querySelector('#continuar').style.display = 'none';
+        document.querySelector('h2').style.display = 'none';
+        document.querySelector('#contenedor-materias').style.display = 'flex';
+        document.querySelector('#botones-horario').style.display = 'flex';
+        document.querySelector('#horario').style.display = 'table';
+        document.querySelector('#horario').innerHTML = '';
+
+        const contenedorMaterias = document.getElementById("contenedor-materias");
+        contenedorMaterias.innerHTML = '';
+
+        materiasSeleccionadasArray.forEach(codigo => {
+            const materia = materias[codigo];
+            if (!materia) return;
+
+            const columnaMateria = document.createElement("div");
+            columnaMateria.classList.add("columna-materia");
+
+            const nombreMateria = document.createElement("h2");
+            nombreMateria.textContent = materia.nombre;
+            columnaMateria.appendChild(nombreMateria);
+
+            for (const [grupo, numSubgrupos] of Object.entries(materia.grupos)) {
+                let docenteGrupo = '';
+                // Buscar docente en el primer subgrupo para mostrar en el grupo principal
+                for (let j = 1; j <= numSubgrupos; j++) {
+                    const subgrupoKey = `${grupo}${j}`;
+                    const docenteCompleto = textosPersonalizados[codigo]?.[subgrupoKey];
+                    if (docenteCompleto) {
+                        const docenteResumido = obtenerNombreDocenteResumido(docenteCompleto);
+                        if (docenteResumido) {
+                            docenteGrupo = ` - ${docenteResumido}`;
+                            break;
+                        }
+                    }
+                }
+
+                const divGrupo = document.createElement("div");
+                divGrupo.style.margin = "5px 0";
+                
+                const checkboxGrupo = document.createElement("input");
+                checkboxGrupo.type = "checkbox";
+                checkboxGrupo.value = grupo;
+                checkboxGrupo.id = `grupo-${codigo}-${grupo}`;
+                checkboxGrupo.addEventListener("change", function() {
+                    window.mostrarSubgrupos(columnaMateria, codigo, grupo, numSubgrupos);
+                });
+                
+                const labelGrupo = document.createElement("label");
+                labelGrupo.htmlFor = `grupo-${codigo}-${grupo}`;
+                
+                // Mostrar el nombre del grupo (para 1 subgrupo se muestra solo el grupo)
+                if (numSubgrupos === 1) {
+                    labelGrupo.innerHTML = ` ${grupo} <strong>${docenteGrupo}</strong>`;
+                } else {
+                    labelGrupo.innerHTML = ` Grupo ${grupo} <strong>${docenteGrupo}</strong>`;
+                }
+                
+                divGrupo.appendChild(checkboxGrupo);
+                divGrupo.appendChild(labelGrupo);
+                columnaMateria.appendChild(divGrupo);
+
+                const contenedorSubgrupos = document.createElement("div");
+                contenedorSubgrupos.id = `subgrupos-${codigo}-${grupo}`;
+                contenedorSubgrupos.style.display = "none";
+                contenedorSubgrupos.style.marginLeft = "20px";
+                columnaMateria.appendChild(contenedorSubgrupos);
+            }
+            contenedorMaterias.appendChild(columnaMateria);
+        });
+
+        document.getElementById("mostrarHorario").onclick = function() {
+            const tabla = document.getElementById("horario");
+            tabla.innerHTML = "";
+
+            const filaDias = document.createElement("tr");
+            filaDias.appendChild(document.createElement("th"));
+            const dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+            dias.forEach(dia => {
+                const th = document.createElement("th");
+                th.textContent = dia;
+                filaDias.appendChild(th);
+            });
+            tabla.appendChild(filaDias);
+
+            const horarios = [
+                "07:00 - 07:45", "07:45 - 08:30", "08:30 - 09:15", "09:15 - 10:00",
+                "10:00 - 10:45", "10:45 - 11:30", "11:30 - 12:15", "12:15 - 13:00",
+                "13:00 - 13:45", "13:45 - 14:30", "14:30 - 15:15", "15:15 - 16:00",
+                "16:00 - 16:45", "16:45 - 17:30", "17:30 - 18:15", "18:15 - 19:00",
+                "19:00 - 19:45", "19:45 - 20:30", "20:30 - 21:15", "21:15 - 22:00",
+                "22:00 - 22:45"
+            ];
+
+            const filasConContenido = [];
+
+            horarios.forEach(horario => {
+                const fila = document.createElement("tr");
+                const th = document.createElement("th");
+                th.textContent = horario;
+                fila.appendChild(th);
+
+                let filaTieneContenido = false;
+
+                dias.forEach(dia => {
+                    const td = document.createElement("td");
+                    let contenido = "";
+                    let materiasEnEsteBloque = [];
+
+                    materiasSeleccionadasArray.forEach(codigo => {
+                        const materia = materias[codigo];
+                        for (const [grupo, numSubgrupos] of Object.entries(materia.grupos)) {
+                            for (let j = 1; j <= numSubgrupos; j++) {
+                                const subgrupoKey = `${grupo}${j}`;
+                                const cb = document.getElementById(`subgrupo-${codigo}-${grupo}-${j}`);
+                                if (cb && cb.checked) {
+                                    const horariosDia = horariosMaterias[codigo]?.[subgrupoKey]?.[dia];
+                                    if (horariosDia && horariosDia.includes(horario)) {
+                                        const nombreVisual = obtenerNombreSubgrupo(grupo, j, numSubgrupos);
+                                        materiasEnEsteBloque.push({ 
+                                            materia: materia.nombre, 
+                                            subgrupo: nombreVisual,
+                                            subgrupoKey: subgrupoKey,
+                                            codigo 
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    if (materiasEnEsteBloque.length > 1) {
+                        td.style.backgroundColor = "#FFFFFF";
+                        td.style.color = "#FF0000";
+                        contenido = "¡CRUCE!<br>" + materiasEnEsteBloque.map(m => {
+                            const docenteCompleto = textosPersonalizados[m.codigo]?.[m.subgrupoKey] || '';
+                            const docenteResumido = obtenerNombreDocenteResumido(docenteCompleto);
+                            return `<strong>${m.materia}</strong> (${m.subgrupo})<br>${docenteResumido}`;
+                        }).join("<br>");
+                        filaTieneContenido = true;
+                    } else if (materiasEnEsteBloque.length === 1) {
+                        const m = materiasEnEsteBloque[0];
+                        const docenteCompleto = textosPersonalizados[m.codigo]?.[m.subgrupoKey] || '';
+                        const docenteResumido = obtenerNombreDocenteResumido(docenteCompleto);
+                        contenido = `<strong>${m.materia}</strong><br>`;
+                        contenido += `Grupo ${m.subgrupo}<br>`;
+                        if (docenteResumido) contenido += `${docenteResumido}<br>`;
+                        td.style.backgroundColor = coloresGrupos[m.codigo]?.[m.subgrupoKey] || "#FFFFFF";
+                        filaTieneContenido = true;
+                    }
+
+                    td.innerHTML = contenido;
+                    fila.appendChild(td);
+                });
+
+                if (filaTieneContenido) {
+                    filasConContenido.push(fila);
+                }
+            });
+
+            filasConContenido.forEach(fila => tabla.appendChild(fila));
+
+            if (filasConContenido.length === 0) {
+                const filaVacia = document.createElement("tr");
+                const td = document.createElement("td");
+                td.colSpan = 7;
+                td.textContent = "No hay horarios para mostrar con las selecciones actuales.";
+                td.style.padding = "20px";
+                td.style.textAlign = "center";
+                filaVacia.appendChild(td);
+                tabla.appendChild(filaVacia);
+            }
+        };
+    }
+
+    window.redirigirAHorario = function() {
+        document.querySelector('#contenedor-materias').innerHTML = '';
+        const materiasSeleccionadas = [];
+        document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+            materiasSeleccionadas.push(cb.value);
+        });
+        if (materiasSeleccionadas.length > 0) {
+            mostrarPantallaHorario(materiasSeleccionadas);
+        } else {
+            alert("Por favor, seleccione al menos una materia.");
+        }
+    };
+
+    // ==================== CONSTRUCTOR DE HORARIO CON PRIORIDADES ====================
+    let estadoConstructor = {
+        materias: [],
+        materiasOriginales: [],
+        selecciones: {},
+        prioridades: {},
+        modo: 'activo'
+    };
+
+    function calcularOpcionesPosibles(codigo) {
+        const materia = materias[codigo];
+        if (!materia) return [];
+        
+        const opciones = [];
+        for (const [grupo, numSubgrupos] of Object.entries(materia.grupos)) {
+            for (let j = 1; j <= numSubgrupos; j++) {
+                const subgrupoKey = `${grupo}${j}`;
+                let compatible = true;
+                for (const [cod, sel] of Object.entries(estadoConstructor.selecciones)) {
+                    if (cod === codigo) continue;
+                    const horariosCandidato = horariosMaterias[codigo]?.[subgrupoKey];
+                    const horariosSeleccionado = horariosMaterias[cod]?.[sel];
+                    if (tienenCruce(horariosCandidato, horariosSeleccionado)) {
+                        compatible = false;
+                        break;
+                    }
+                }
+                if (compatible) opciones.push(subgrupoKey);
+            }
+        }
+        return opciones;
+    }
+
+    function calcularEstadisticas() {
+        let totalCombinaciones = 1;
+        let combinacionesExcedidas = false;
+        for (const codigo of estadoConstructor.materias) {
+            if (!estadoConstructor.selecciones[codigo]) {
+                const opciones = calcularOpcionesPosibles(codigo);
+                if (totalCombinaciones * opciones.length > 10000) {
+                    combinacionesExcedidas = true;
+                    break;
+                }
+                totalCombinaciones *= opciones.length;
+            }
+        }
+        return { seleccionadas: Object.keys(estadoConstructor.selecciones).length, total: combinacionesExcedidas ? 10000 : totalCombinaciones };
+    }
+
+    function actualizarOpcionesConstructor() {
+        const contenedor = document.getElementById('opciones-dinamicas');
+        if (!contenedor) return;
+        
+        const prioridades = estadoConstructor.prioridades || {};
+        
+        let html = `
+            <div class="instrucciones-prioridad">
+                <span><span class="ejemplo-prioridad">1</span> Haga clic en cualquier tarjeta para asignarle prioridad. El orden de prioridad determina qué materia se intentará agendar primero.</span>
+                <button onclick="reiniciarPrioridades()" class="boton-ordenar">↻ Reiniciar Prioridades</button>
+            </div>
+            <div id="sortable-container" style="display: flex; flex-wrap: wrap; gap: 20px;">
+        `;
+        
+        estadoConstructor.materias.forEach((codigo, index) => {
+            const materia = materias[codigo];
+            const tieneSeleccion = !!estadoConstructor.selecciones[codigo];
+            const prioridad = prioridades[codigo] || null;
+            const opcionesPosibles = calcularOpcionesPosibles(codigo);
+            
+            // Función para obtener nombre visual de la opción
+            function getNombreVisual(subgrupoKey) {
+                const grupo = subgrupoKey[0];
+                const numero = parseInt(subgrupoKey.substring(1));
+                const numSubgrupos = materia.grupos[grupo] || 1;
+                return obtenerNombreSubgrupo(grupo, numero, numSubgrupos);
+            }
+            
+            html += `
+                <div class="materia-prioridad ${tieneSeleccion ? 'seleccionada' : ''}" data-codigo="${codigo}" onclick="seleccionarPrioridad('${codigo}')" style="flex: 1; min-width: 280px; background: white; border: 2px solid ${tieneSeleccion ? '#3b82f6' : '#e2e8f0'}; padding: 15px; border-radius: 12px; transition: all 0.2s; position: relative;">
+                    ${prioridad ? `<div class="numero-prioridad">${prioridad}</div>` : ''}
+                    <div style="display: flex; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0;">
+                        <span style="background: ${tieneSeleccion ? '#3b82f6' : '#f1f5f9'}; color: ${tieneSeleccion ? 'white' : '#64748b'}; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; font-weight: bold; margin-right: 8px;">${index + 1}</span>
+                        <strong style="color: #0f172a; font-size: 12px; flex: 1;">${materia ? materia.nombre : 'Materia no encontrada'}</strong>
+                        <span style="background: ${tieneSeleccion ? '#3b82f620' : '#f1f5f9'}; color: ${tieneSeleccion ? '#2563eb' : '#64748b'}; padding: 2px 8px; border-radius: 12px; font-size: 10px; margin-left: 5px;">${opcionesPosibles.length} opc.</span>
+                    </div>
+                    <select onchange="actualizarSeleccion('${codigo}', this.value)" onclick="event.stopPropagation()" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 8px; font-size: 11px;">
+                        <option value="">Seleccione grupo...</option>
+            `;
+            
+            const opcionesOrdenadas = [...opcionesPosibles].sort();
+            opcionesOrdenadas.forEach(subgrupoKey => {
+                const selected = estadoConstructor.selecciones[codigo] === subgrupoKey ? 'selected' : '';
+                const nombreVisual = getNombreVisual(subgrupoKey);
+                const docente = textosPersonalizados[codigo]?.[subgrupoKey] || 'Docente no asignado';
+                html += `<option value="${subgrupoKey}" ${selected}>${nombreVisual} - ${docente}</option>`;
+            });
+            
+            html += `</select>`;
+            if (estadoConstructor.selecciones[codigo]) {
+                const docenteCompleto = textosPersonalizados[codigo]?.[estadoConstructor.selecciones[codigo]] || '';
+                const docenteResumido = obtenerNombreDocenteResumido(docenteCompleto);
+                const color = coloresGrupos[codigo]?.[estadoConstructor.selecciones[codigo]] || '#f8fafc';
+                const nombreVisualSeleccionado = (() => {
+                    const sel = estadoConstructor.selecciones[codigo];
+                    const grupo = sel[0];
+                    const numero = parseInt(sel.substring(1));
+                    const numSubgrupos = materia.grupos[grupo] || 1;
+                    return obtenerNombreSubgrupo(grupo, numero, numSubgrupos);
+                })();
+                html += `<div style="font-size: 10px; padding: 6px; background: ${color}; border-radius: 6px; margin-top: 5px;"><span style="color: #1e293b;">📚 ${nombreVisualSeleccionado} - ${docenteResumido || 'Docente no asignado'}</span></div>`;
+            }
+            html += `</div>`;
+        });
+        
+        html += '</div>';
+        contenedor.innerHTML = html;
+        
+        const stats = calcularEstadisticas();
+        document.getElementById('contador-opciones').textContent = stats.total >= 10000 ? '+9999' : stats.total;
+        const progreso = (Object.keys(estadoConstructor.selecciones).length / estadoConstructor.materias.length) * 100;
+        document.getElementById('barra-progreso').style.width = `${progreso}%`;
+    }
+
+    window.seleccionarPrioridad = function(codigo) {
+        if (!estadoConstructor.prioridades) estadoConstructor.prioridades = {};
+        if (estadoConstructor.selecciones[codigo]) {
+            alert('Primero deseleccione el grupo de esta materia para cambiar su prioridad.');
+            return;
+        }
+        if (estadoConstructor.prioridades[codigo]) {
+            delete estadoConstructor.prioridades[codigo];
+            const nuevasPrioridades = {};
+            let contador = 1;
+            estadoConstructor.materias.forEach(mat => {
+                if (estadoConstructor.prioridades[mat]) nuevasPrioridades[mat] = contador++;
+            });
+            estadoConstructor.prioridades = nuevasPrioridades;
+        } else {
+            const siguientePrioridad = Object.keys(estadoConstructor.prioridades).length + 1;
+            estadoConstructor.prioridades[codigo] = siguientePrioridad;
+        }
+        actualizarOpcionesConstructor();
+    };
+
+    window.reiniciarPrioridades = function() {
+        estadoConstructor.prioridades = {};
+        actualizarOpcionesConstructor();
+    };
+
+    window.actualizarSeleccion = function(codigo, valor) {
+        if (valor) estadoConstructor.selecciones[codigo] = valor;
+        else delete estadoConstructor.selecciones[codigo];
+        actualizarOpcionesConstructor();
+    };
+
+    window.completarAutomaticamente = function() {
+        const materiasConPrioridad = [];
+        const materiasSinPrioridad = [];
+        estadoConstructor.materias.forEach(codigo => {
+            if (estadoConstructor.prioridades[codigo]) materiasConPrioridad.push(codigo);
+            else materiasSinPrioridad.push(codigo);
+        });
+        materiasConPrioridad.sort((a, b) => (estadoConstructor.prioridades[a] || 999) - (estadoConstructor.prioridades[b] || 999));
+        const materiasOrdenadas = [...materiasConPrioridad, ...materiasSinPrioridad];
+        
+        function buscarCompletar(index) {
+            if (index >= materiasOrdenadas.length) return true;
+            const codigo = materiasOrdenadas[index];
+            if (estadoConstructor.selecciones[codigo]) return buscarCompletar(index + 1);
+            const opciones = calcularOpcionesPosibles(codigo);
+            for (const opcion of opciones) {
+                estadoConstructor.selecciones[codigo] = opcion;
+                if (buscarCompletar(index + 1)) return true;
+                delete estadoConstructor.selecciones[codigo];
+            }
+            return false;
+        }
+        
+        if (buscarCompletar(0)) {
+            actualizarOpcionesConstructor();
+            verHorarioActual();
+        } else {
+            alert("No se puede completar el horario automáticamente. Intente seleccionar algunas materias manualmente o ajuste las prioridades.");
+        }
+    };
+
+    window.reiniciarConstructor = function() {
+        estadoConstructor.selecciones = {};
+        estadoConstructor.prioridades = {};
+        actualizarOpcionesConstructor();
+    };
+
+    window.verHorarioActual = function() {
+        if (Object.keys(estadoConstructor.selecciones).length === 0) {
+            alert("Seleccione al menos un grupo para ver el horario.");
+            return;
+        }
+        mostrarPantallaHorario(estadoConstructor.materias);
+        setTimeout(() => {
+            for (const [codigo, subgrupoKey] of Object.entries(estadoConstructor.selecciones)) {
+                const grupo = subgrupoKey[0];
+                const numero = parseInt(subgrupoKey.substring(1));
+                const grupoCheckbox = document.getElementById(`grupo-${codigo}-${grupo}`);
+                if (grupoCheckbox) {
+                    grupoCheckbox.checked = true;
+                    const columna = grupoCheckbox.closest('.columna-materia');
+                    if (columna) {
+                        const numSubgrupos = materias[codigo]?.grupos[grupo] || 0;
+                        window.mostrarSubgrupos(columna, codigo, grupo, numSubgrupos);
+                        setTimeout(() => {
+                            const subCheckbox = document.getElementById(`subgrupo-${codigo}-${grupo}-${numero}`);
+                            if (subCheckbox) subCheckbox.checked = true;
+                        }, 100);
+                    }
+                }
+            }
+        }, 500);
+    };
+
+    window.iniciarConstructorHorario = function() {
+        const materiasSeleccionadas = [];
+        document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+            materiasSeleccionadas.push(cb.value);
+        });
+        if (materiasSeleccionadas.length === 0) {
+            alert("Por favor, seleccione al menos una materia.");
+            return;
+        }
+
+        document.querySelector('#contenedor-anos').style.display = 'none';
+        document.querySelector('#continuar').style.display = 'none';
+        document.querySelector('h2').style.display = 'none';
+        
+        const panelAnterior = document.getElementById('constructor-panel');
+        if (panelAnterior) panelAnterior.remove();
+
+        const panel = document.createElement('div');
+        panel.id = 'constructor-panel';
+        panel.innerHTML = `
+            <div style="background: white; padding: 25px; border-radius: 16px; margin: 20px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; color: #0f172a; font-weight: 600;">🛠️ Constructor de Horario</h3>
+                    <button onclick="cerrarConstructor()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #64748b;">✕</button>
+                </div>
+                <p style="color: #475569; margin-bottom: 20px;">Haga clic en cualquier tarjeta para asignarle prioridad. El orden de prioridad determina qué materia se intentará agendar primero.</p>
+                <div id="opciones-dinamicas" style="margin-bottom: 20px;"></div>
+                <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 500; color: #334155;">Horarios posibles:</span>
+                        <span id="contador-opciones" style="font-weight: 700; color: #2563eb; font-size: 18px;">Calculando...</span>
+                    </div>
+                    <div style="margin-top: 10px; height: 4px; background: #e2e8f0; border-radius: 2px;">
+                        <div id="barra-progreso" style="height: 100%; background: #22c55e; border-radius: 2px; width: 0%;"></div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button onclick="completarAutomaticamente()" style="background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 12px 24px; border: none; border-radius: 30px; font-weight: 500; cursor: pointer; flex: 1;">⚡ Completar Automáticamente</button>
+                    <button onclick="reiniciarConstructor()" style="background: #f1f5f9; color: #334155; padding: 12px 24px; border: 1px solid #cbd5e1; border-radius: 30px; font-weight: 500; cursor: pointer;">↻ Reiniciar</button>
+                    <button onclick="verHorarioActual()" style="background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 30px; font-weight: 500; cursor: pointer;">👁️ Ver Horario</button>
+                </div>
+                <div style="margin-top: 15px; text-align: center; font-size: 11px; color: #94a3b8;">Las opciones se actualizan automáticamente según sus selecciones</div>
+            </div>
+        `;
+        
+        document.querySelector('#contenedor-anos').insertAdjacentElement('afterend', panel);
+        
+        estadoConstructor = {
+            materias: materiasSeleccionadas,
+            materiasOriginales: [...materiasSeleccionadas],
+            selecciones: {},
+            prioridades: {},
+            modo: 'activo'
+        };
+        
+        actualizarOpcionesConstructor();
+    };
+
+    window.cerrarConstructor = function() {
+        document.getElementById('constructor-panel')?.remove();
+        document.querySelector('#contenedor-anos').style.display = 'flex';
+        document.querySelector('#continuar').style.display = 'inline-block';
+        document.querySelector('h2').style.display = 'block';
+    };
+
+    // ==================== FUNCIONES DE NAVEGACIÓN ====================
+    window.volverAlInicioCompleto = function() {
+        document.querySelector('#contenedor-anos').style.display = 'flex';
+        document.querySelector('#continuar').style.display = 'inline-block';
+        document.querySelector('h2').style.display = 'block';
+        document.querySelector('#contenedor-materias').style.display = 'none';
+        document.querySelector('#botones-horario').style.display = 'none';
+        document.querySelector('#horario').style.display = 'none';
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        document.querySelectorAll('[id^="subgrupos-"]').forEach(container => {
+            container.innerHTML = '';
+            container.style.display = 'none';
+        });
+        const tablaHorario = document.getElementById('horario');
+        if (tablaHorario) tablaHorario.innerHTML = '';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.volverAlMenu = function() {
+        volverAlInicioCompleto();
+    };
+
+    // ==================== EXPORTAR A EXCEL ====================
+    window.exportarAExcel = function() {
+        const tabla = document.getElementById('horario');
+        if (!tabla || tabla.innerHTML.trim() === '') {
+            alert('No hay horario generado para exportar.');
+            return;
+        }
+        
+        try {
+            const tablaClone = tabla.cloneNode(true);
+            const filas = tablaClone.querySelectorAll('tr');
+            filas.forEach(fila => {
+                const celdas = fila.querySelectorAll('td');
+                celdas.forEach(celda => {
+                    const originalCelda = Array.from(document.querySelectorAll('#horario td')).find(
+                        td => td.textContent === celda.textContent && td.parentElement.rowIndex === fila.rowIndex
+                    );
+                    if (originalCelda) {
+                        const bgColor = window.getComputedStyle(originalCelda).backgroundColor;
+                        if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
+                            celda.style.backgroundColor = bgColor;
+                        }
+                        const color = window.getComputedStyle(originalCelda).color;
+                        if (color && color !== 'rgb(0, 0, 0)') {
+                            celda.style.color = color;
+                        }
+                    }
+                });
+            });
+            
+            const materiasInfo = [];
+            document.querySelectorAll('#contenedor-materias .columna-materia').forEach(columna => {
+                const nombreMateria = columna.querySelector('h2')?.textContent || '';
+                const gruposSeleccionados = [];
+                columna.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+                    if (cb.id.includes('subgrupo-')) {
+                        const valor = cb.value;
+                        gruposSeleccionados.push(valor);
+                    }
+                });
+                if (gruposSeleccionados.length > 0) {
+                    materiasInfo.push(`${nombreMateria} (Grupos: ${gruposSeleccionados.join(', ')})`);
+                }
+            });
+            
+            const fecha = new Date().toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const fechaArchivo = new Date().toISOString().split('T')[0];
+            const horaArchivo = new Date().toLocaleTimeString('es-ES').replace(/:/g, '-');
+            const nombreArchivo = `Horario_Medicina_${fechaArchivo}_${horaArchivo}.xls`;
+            
+            const contenidoHTML = `
+                <html>
+                    <head><meta charset="UTF-8"><title>Horario de Medicina - U.A.G.R.M.</title>
+                    <style>
+                        body { font-family: 'Calibri', 'Segoe UI', Arial, sans-serif; margin: 20px; }
+                        .header { background: linear-gradient(135deg, #0f172a, #1e293b); color: white; padding: 20px; border-radius: 10px 10px 0 0; }
+                        h1 { margin: 0; font-size: 24px; }
+                        .subheader { background: #f8fafc; padding: 15px 20px; border: 1px solid #e2e8f0; border-top: none; margin-bottom: 20px; }
+                        table { border-collapse: collapse; width: 100%; background: white; }
+                        th { background: #f1f5f9; color: #0f172a; padding: 12px 8px; border: 1px solid #cbd5e1; }
+                        td { border: 1px solid #cbd5e1; padding: 8px 4px; vertical-align: top; font-size: 11px; }
+                        .footer { margin-top: 30px; color: #64748b; font-size: 10px; text-align: center; }
+                    </style>
+                    </head>
+                    <body>
+                        <div class="header"><h1>🏥 HORARIO MEDICINA GESTIÓN 2026</h1></div>
+                        <div class="subheader">
+                            <div><strong>📅 Fecha de generación:</strong> ${fecha}</div>
+                            ${materiasInfo.length > 0 ? `<div><strong>📖 Materias seleccionadas:</strong><br><ul>${materiasInfo.map(m => `<li>${m}</li>`).join('')}</ul></div>` : ''}
+                        </div>
+                        ${tablaClone.outerHTML}
+                        <div class="footer"><p>Desarrollado por Erik León - 2026 | Los horarios están sujetos a cambios según disposición de la facultad</p></div>
+                    </body>
+                </html>
+            `;
+            
+            const blob = new Blob([contenidoHTML], { type: 'application/vnd.ms-excel' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nombreArchivo;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Hubo un error al exportar. Por favor, intente nuevamente.');
+        }
+    };
+})();
+</script>
+</body>
+</html>
